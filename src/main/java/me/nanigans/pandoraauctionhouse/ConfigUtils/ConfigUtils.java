@@ -28,6 +28,12 @@ import java.util.stream.Collectors;
 
 public class ConfigUtils {
 
+    /**
+     * Allows the player to remove all listings under a single category
+     * @param info auction house info
+     * @param category category to remove from
+     * @param mat the material to remove
+     */
     public static void removePlayerListing(AuctionHouseInventory info, AuctionCategories category, Material mat){
 
         File file = new File(info.getPlugin().path+"/Categories/"+category+"/"+mat);
@@ -106,6 +112,12 @@ public class ConfigUtils {
 
     }
 
+    /**
+     * Gets the items back from the listing they removed
+     * @param player the player to give to
+     * @param filePath the path of the yml file
+     * @param category the category to the yml file
+     */
     public static void giveItemsBackToPlayer(Player player, String filePath, AuctionCategories category){
 
         YamlGenerator yaml = new YamlGenerator(filePath);
@@ -118,7 +130,6 @@ public class ConfigUtils {
                 itemStack.addEnchantments(enchants);
                 itemStack = NBTData.removeNBT(itemStack, NBTEnums.NBT.ENCHANTS.toString());
             }
-            System.out.println("category = " + category);
             if (category != AuctionCategories.ALL && !player.getInventory().addItem(itemStack).isEmpty())
                 player.getWorld().dropItem(player.getLocation(), itemStack);
 
