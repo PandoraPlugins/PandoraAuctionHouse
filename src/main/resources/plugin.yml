@@ -1,0 +1,11 @@
+name: PandoraAuctionHouse
+version: ${project.version}
+main: me.nanigans.pandoraauctionhouse.PandoraAuctionHouse
+authors: [ProNanigans]
+description: An auction house for pandorapvp
+website: www.dustie.xyz
+commands:
+  auctionhouse:
+    description: Opens auction house plugin
+    usage: /auctionhouse
+    aliases: [ah]
