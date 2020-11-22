@@ -2,6 +2,7 @@ package me.nanigans.pandoraauctionhouse;
 
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import me.nanigans.pandoraauctionhouse.Classifications.InventoryType;
+import me.nanigans.pandoraauctionhouse.Classifications.ItemType;
 import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.InvUtils.InventoryActionUtils;
@@ -76,9 +77,8 @@ public class AuctionHouseInventory implements Listener {
             }else if(event.getAction().toString().contains("DROP")){
                 if(currentItem != null){
 
-                    String data = NBTData.getNBT(currentItem, "SETCATEGORY");
-                    if(data != null){
-
+                    if(NBTData.containsNBT(currentItem, "SETCATEGORY")){
+                        String data = NBTData.getNBT(currentItem, "SETCATEGORY");
                         AuctionCategories category = AuctionCategories.valueOf(data);
                         if(category == AuctionCategories.ALL){
                             for(AuctionCategories cate : AuctionCategories.values())
@@ -87,8 +87,19 @@ public class AuctionHouseInventory implements Listener {
                             String msg = ConfigUtils.removePlayerListing(this, category);
                             if(msg != null) this.player.sendMessage(msg);
                         }
+                    }else if(NBTData.containsNBT(currentItem, "METHOD")){
+                        String data = NBTData.getNBT(currentItem, "METHOD");
+                        if(data.equals("openMaterial")){
+                            if(this.getCategory() != AuctionCategories.ALL) {
+                                ConfigUtils.removePlayerListing(this, this.getCategory(), currentItem.getType());
+                                ConfigUtils.removePlayerListing(this, AuctionCategories.ALL, currentItem.getType());
+                            }else{
+                                final AuctionCategories itemCategory = ItemType.getItemCategory(currentItem);
+                                ConfigUtils.removePlayerListing(this, this.getCategory(), currentItem.getType());
+                                ConfigUtils.removePlayerListing(this, itemCategory, currentItem.getType());
 
-
+                            }
+                        }
                     }
 
                 }

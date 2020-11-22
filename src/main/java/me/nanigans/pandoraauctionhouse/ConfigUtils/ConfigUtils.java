@@ -28,6 +28,36 @@ import java.util.stream.Collectors;
 
 public class ConfigUtils {
 
+    public static void removePlayerListing(AuctionHouseInventory info, AuctionCategories category, Material mat){
+
+        File file = new File(info.getPlugin().path+"/Categories/"+category+"/"+mat);
+        if(file.exists()){
+            final File[] files = file.listFiles();
+            if(Arrays.stream(files).anyMatch(i -> i.getName().contains(info.getPlayer().getUniqueId().toString()))){
+
+                final File collect = Arrays.stream(files).filter(i -> i.getName().contains(info.getPlayer().getUniqueId().toString())).collect(Collectors.toList()).get(0);
+                if(collect != null){
+
+                    giveItemsBackToPlayer(info.getPlayer(), collect.getAbsolutePath(), category);
+                    if(category != AuctionCategories.ALL)
+                    info.getPlayer().sendMessage(ChatColor.GREEN+"Successfully removed the listing!");
+                    collect.delete();
+                    if(file.list() != null && file.list().length == 0)
+                        file.delete();
+                }
+
+            }else if(category != AuctionCategories.ALL){
+                info.getPlayer().closeInventory();
+                info.getPlayer().sendMessage(ChatColor.RED+"You are not selling anything in this category");
+            }
+
+        }else if(category != AuctionCategories.ALL){
+            info.getPlayer().closeInventory();
+            info.getPlayer().sendMessage(ChatColor.RED+"Nothing is listed in this category");//this shouldn't really happen
+        }
+
+    }
+
     /**
      * This removes any items the player is selling from a given category
      * @param info auction house info
@@ -39,7 +69,7 @@ public class ConfigUtils {
         File file = new File(info.getPlugin().path+"/Categories/"+category);
         final File[] materialFiles = file.listFiles();
         if(materialFiles != null){
-        for (File materialFile : materialFiles) {
+        for (File materialFile : materialFiles) {//material folders
             if(materialFile.isDirectory()) {
                 if (Arrays.stream(materialFile.list()).anyMatch(i -> i.contains(info.getPlayer().getUniqueId().toString()))) {
 
@@ -51,20 +81,7 @@ public class ConfigUtils {
                                     .filter(i -> i.getName().contains(info.getPlayer().getUniqueId().toString())).collect(Collectors.toList());
                             for (File value : collect) {
 
-                                YamlGenerator yaml = new YamlGenerator(value.getAbsolutePath());
-                                final FileConfiguration data = yaml.getData();
-                                final List<ItemStack> selling = (List<ItemStack>) data.getList("selling");
-                                for (ItemStack itemStack : selling) {
-                                    if (NBTData.containsNBT(itemStack, NBTEnums.NBT.ENCHANTS.toString())) {
-
-                                        Map<Enchantment, Integer> enchants = ItemData.parseEnchantNBT(NBTData.getNBT(itemStack, NBTEnums.NBT.ENCHANTS.toString()));
-                                        itemStack.addEnchantments(enchants);
-                                        itemStack = NBTData.removeNBT(itemStack, NBTEnums.NBT.ENCHANTS.toString());
-                                    }
-                                    if (category != AuctionCategories.ALL && !info.getPlayer().getInventory().addItem(itemStack).isEmpty())
-                                        info.getPlayer().getWorld().dropItem(info.getPlayer().getLocation(), itemStack);
-
-                                }
+                                giveItemsBackToPlayer(info.getPlayer(), value.getAbsolutePath(), category);
 
                                 value.delete();
                                 if (materialFile.list() != null && materialFile.list().length == 0)
@@ -75,15 +92,37 @@ public class ConfigUtils {
                     }.runTaskAsynchronously(info.getPlugin());
 
                 }else{
+                    info.getPlayer().closeInventory();
                     return ChatColor.RED+"You are not selling anything in this category";
                 }
             }
 
             }
         }else{
+            info.getPlayer().closeInventory();
             return ChatColor.RED+"Couldn't find any materials in this category";
         }
         return null;
+
+    }
+
+    public static void giveItemsBackToPlayer(Player player, String filePath, AuctionCategories category){
+
+        YamlGenerator yaml = new YamlGenerator(filePath);
+        final FileConfiguration data = yaml.getData();
+        final List<ItemStack> selling = (List<ItemStack>) data.getList("selling");
+        for (ItemStack itemStack : selling) {
+            if (NBTData.containsNBT(itemStack, NBTEnums.NBT.ENCHANTS.toString())) {
+
+                Map<Enchantment, Integer> enchants = ItemData.parseEnchantNBT(NBTData.getNBT(itemStack, NBTEnums.NBT.ENCHANTS.toString()));
+                itemStack.addEnchantments(enchants);
+                itemStack = NBTData.removeNBT(itemStack, NBTEnums.NBT.ENCHANTS.toString());
+            }
+            System.out.println("category = " + category);
+            if (category != AuctionCategories.ALL && !player.getInventory().addItem(itemStack).isEmpty())
+                player.getWorld().dropItem(player.getLocation(), itemStack);
+
+        }
 
     }
 
