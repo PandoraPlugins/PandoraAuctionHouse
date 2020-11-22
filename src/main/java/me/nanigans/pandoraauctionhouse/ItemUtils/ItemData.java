@@ -11,6 +11,11 @@ import java.util.regex.Pattern;
 
 public class ItemData {
 
+    /**
+     * Serealizes any enchantments including the Glow effect
+     * @param item the item to serialize
+     * @return a map with enchantment and its id
+     */
     public static Map<Enchantment, Integer> serializeEnchantment(ItemStack item){
 
         Map<Enchantment, Integer> enchants = new HashMap<>();
@@ -20,6 +25,11 @@ public class ItemData {
         return enchants;
     }
 
+    /**
+     * Converts a string of text into an enchantment
+     * @param text the text to parse
+     * @return a map with enchantmentand its id
+     */
     public static Map<Enchantment, Integer> parseEnchantNBT(String text){
 
         Map<Enchantment, Integer> map = new LinkedHashMap<>();

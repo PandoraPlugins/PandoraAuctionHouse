@@ -12,11 +12,12 @@ import org.bukkit.inventory.Inventory;
 
 public class AuctionHouseInventory implements Listener {
 
-    private Player player;
-    private PandoraAuctionHouse plugin;
+    private final Player player;
+    private final PandoraAuctionHouse plugin;
     private Inventory inventory;
     private boolean swappingInvs = false;
     private int page = 0;
+    private byte categoryFirst = 0;
     private AuctionCategories category = AuctionCategories.ALL;
 
     public AuctionHouseInventory(Player player){
@@ -26,6 +27,7 @@ public class AuctionHouseInventory implements Listener {
         this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
         Inventory inventory = InventoryCreation.createAuctionHousePage(this);
         player.openInventory(inventory);
+
 
     }
 
@@ -56,6 +58,14 @@ public class AuctionHouseInventory implements Listener {
         this.player.openInventory(newInv);
         this.swappingInvs = false;
 
+    }
+
+    public byte getCategoryFirst() {
+        return categoryFirst;
+    }
+
+    public void setCategoryFirst(byte categoryFirst) {
+        this.categoryFirst = categoryFirst;
     }
 
     public AuctionCategories getCategory() {
