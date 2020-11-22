@@ -4,7 +4,17 @@ public class NBTEnums {
 
     public enum NBT{
         ENCHANTS,
-        PRICE
+        PRICE,
+        CATEGORYDOWN,
+        CATEGORYUP,
+        PAGEBACK,
+        PAGEFORWARD,
+        SORTBY,
+        NEWEST,
+        OLDEST,
+        SEARCH,
+        NAME,
+        PLAYER
     }
 
 }
