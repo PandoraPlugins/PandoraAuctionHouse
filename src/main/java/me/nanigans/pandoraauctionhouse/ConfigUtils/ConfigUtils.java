@@ -28,6 +28,12 @@ import java.util.stream.Collectors;
 
 public class ConfigUtils {
 
+    /**
+     * This removes any items the player is selling from a given category
+     * @param info auction house info
+     * @param category the category to delete
+     * @return a message to the player if a listing was found
+     */
     public static String removePlayerListing(AuctionHouseInventory info, AuctionCategories category){
 
         File file = new File(info.getPlugin().path+"/Categories/"+category);
