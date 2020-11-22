@@ -32,7 +32,10 @@ public class AuctionHouseInventory implements Listener {
     @EventHandler
     public void onInvClick(InventoryClickEvent event){
 
+        if(event.getInventory().equals(this.inventory)){
+            event.setCancelled(true);
 
+        }
 
     }
 

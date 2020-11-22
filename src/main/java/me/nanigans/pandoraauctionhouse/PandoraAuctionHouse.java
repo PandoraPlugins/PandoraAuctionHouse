@@ -1,7 +1,7 @@
 package me.nanigans.pandoraauctionhouse;
 
 import me.nanigans.pandoraauctionhouse.Commands.AuctionHouse;
-import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigCreators;
+import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,7 +17,7 @@ public final class PandoraAuctionHouse extends JavaPlugin implements Listener {
         getCommand("auctionhouse").setExecutor(new AuctionHouse());
         try {
             for(AuctionCategories category : AuctionCategories.values()){
-                ConfigCreators.createAHConfigFolder("Categories/"+ category);
+                ConfigUtils.createAHConfigFolder("Categories/"+ category);
             }
 
         } catch (IOException e) {

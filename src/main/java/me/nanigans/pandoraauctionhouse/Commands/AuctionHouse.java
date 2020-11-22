@@ -4,10 +4,9 @@ import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import me.nanigans.pandoraauctionhouse.Classifications.ItemType;
 import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums;
-import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigCreators;
+import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.ItemUtils.ItemData;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
-import me.nanigans.pandoraauctionhouse.PandoraAuctionHouse;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -46,7 +45,7 @@ public class AuctionHouse implements CommandExecutor {
                                 }
                                 AuctionCategories category = ItemType.getItemCategory(item);
 
-                                ConfigCreators.addItemToPlayer(category, player, item);
+                                ConfigUtils.addItemToPlayer(category, player, item);
 
                                 player.sendMessage(ChatColor.GOLD + "You have listed " + ChatColor.WHITE
                                         + item.getAmount() + "x" + item.getType() + " for $" + ChatColor.GREEN + price);

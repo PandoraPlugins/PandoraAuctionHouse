@@ -2,12 +2,14 @@ package me.nanigans.pandoraauctionhouse.ConfigUtils;
 
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import me.nanigans.pandoraauctionhouse.PandoraAuctionHouse;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ConfigCreators {
+public class ConfigUtils {
 
     public static void createAHConfigFolder(String path) throws IOException {
         PandoraAuctionHouse plugin = PandoraAuctionHouse.getPlugin(PandoraAuctionHouse.class);
@@ -29,6 +31,12 @@ public class ConfigCreators {
 
     }
 
+    /**
+     * Adds a new listing to the players desired category. This'll add it to the category and the ALL category
+     * @param category the category to add to
+     * @param player the player adding the listing
+     * @param item the item to add to the listing
+     */
     public static void addItemToPlayer(AuctionCategories category, Player player, ItemStack item){
         PandoraAuctionHouse plugin = PandoraAuctionHouse.getPlugin(PandoraAuctionHouse.class);
 
@@ -46,6 +54,24 @@ public class ConfigCreators {
             }
 
             yaml.save();
+
+    }
+
+    /**
+     * Gets all the materials from a category
+     * @param category the category need to get the material list
+     * @return a list of materials
+     */
+    public static List<Material> getMaterialsFromCategory(AuctionCategories category){
+        PandoraAuctionHouse plugin = PandoraAuctionHouse.getPlugin(PandoraAuctionHouse.class);
+        List<Material> list = new ArrayList<>();
+        File file = new File(plugin.path+"/Categories/"+category);
+
+        for (String s : file.list()) {
+            if(new File(file.getPath()+"/"+s).isDirectory())
+                list.add(Material.valueOf(s));
+        }
+        return list;
 
     }
 

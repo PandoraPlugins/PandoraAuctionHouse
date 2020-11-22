@@ -4,6 +4,7 @@ import com.earth2me.essentials.Essentials;
 import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums.NBT;
+import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -65,7 +66,13 @@ public class InventoryCreation {
             inventory.setItem(categoryPlace, iterator.next());
         }
 
+        List<Material> materialList = ConfigUtils.getMaterialsFromCategory(AuctionCategories.ALL);
+        for (int i = 0; i < materialList.size(); i++) {
+            inventory.setItem(itemPlaces[i], new ItemStack(materialList.get(i)));
+        }
+
         for (int itemPlace : itemPlaces) {
+            if(inventory.getItem(itemPlace) == null)
             inventory.setItem(itemPlace, createItem("160/4", "Empty Slot"));
         }
         for (int i = 0; i < inventory.getContents().length; i++) {
