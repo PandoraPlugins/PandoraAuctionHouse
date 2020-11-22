@@ -36,12 +36,25 @@ public class InventoryActionUtils {
 
     }
 
+    /**
+     * Sorts a list alphabetically or its inverse
+     * @param list the list to sort
+     * @param inverse weather to flip the list
+     * @param <T> must be able to be a string
+     * @return a new sorted list
+     */
+
     public static <T> List<String> sortByAlphabetical(List<T> list, boolean inverse){
         List<String> stringified = list.stream().map(Object::toString).sorted().collect(Collectors.toList());
         if(inverse) Collections.reverse(stringified);
         return stringified;
     }
 
+    /**
+     * Sets the listing board to what was found in the list
+     * @param info auction info
+     * @param list the list to put in the auction house
+     */
     public static void replaceByItems(AuctionHouseInventory info, List<ExtractedResult> list){
 
         clearItemBoard(info);
@@ -56,6 +69,10 @@ public class InventoryActionUtils {
 
     }
 
+    /**
+     * This will clera the item board with yellow glass
+     * @param info
+     */
     public static void clearItemBoard(AuctionHouseInventory info){
 
         for (int itemPlace : itemPlaces) {

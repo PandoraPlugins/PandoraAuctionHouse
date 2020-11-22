@@ -55,7 +55,7 @@ public class InventoryCreation {
         meta.setOwner(info.getPlayer().getName());
         meta.setDisplayName("Your listings");
         head.setItemMeta(meta);
-        inventory.setItem(16, head);
+        inventory.setItem(16, NBTData.setNBT(head, "METHOD~playerListings"));
 
         ItemStack filters = createItem(Material.DIAMOND, "Sort By:", NBT.SORTBY+"~"+Sorted.A_Z, "METHOD~sortBy");
 
