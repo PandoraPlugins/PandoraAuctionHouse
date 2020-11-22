@@ -2,11 +2,15 @@ package me.nanigans.pandoraauctionhouse.InvUtils;
 
 import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
+import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums;
 import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.libs.org.ibex.nestedvm.util.Sort;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -18,10 +22,23 @@ import static me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation.itemPla
 
 public class InventoryActions {
 
+    /**
+     * Changes the sort method between A-Z and Z-A
+     * @param info auction house info
+     */
     public static void sortBy(AuctionHouseInventory info){
+        if(info.getSorted() == Sorted.A_Z) {
+            info.setSorted(Sorted.Z_A);
+        }
+        else info.setSorted(Sorted.A_Z);
+        ItemStack filters = createItem(Material.DIAMOND, "Sort By:", NBTEnums.NBT.SORTBY+"~"+ Sorted.A_Z, "METHOD~sortBy");
 
-
-
+        ItemMeta itemMeta = filters.getItemMeta();
+        itemMeta.setLore(Arrays.asList((info.getSorted() == Sorted.A_Z ? ChatColor.GOLD : ChatColor.GRAY)+"A-Z",
+                (info.getSorted() == Sorted.Z_A ? ChatColor.GOLD : ChatColor.GRAY)+"Z-A"));
+        filters.setItemMeta(itemMeta);
+        info.getInventory().setItem(25, filters);
+        InventoryActionUtils.replaceCategory(info);
     }
 
     /**

@@ -57,7 +57,7 @@ public class InventoryCreation {
         head.setItemMeta(meta);
         inventory.setItem(16, head);
 
-        ItemStack filters = createItem(Material.DIAMOND, "Sort By:", NBT.SORTBY+"~"+NBT.A_Z, "METHOD~sortBy");
+        ItemStack filters = createItem(Material.DIAMOND, "Sort By:", NBT.SORTBY+"~"+Sorted.A_Z, "METHOD~sortBy");
 
         ItemMeta itemMeta = filters.getItemMeta();
         itemMeta.setLore(Arrays.asList((info.getSorted() == Sorted.A_Z ? ChatColor.GOLD : ChatColor.GRAY)+"A-Z",
