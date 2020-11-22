@@ -1,5 +1,6 @@
 package me.nanigans.pandoraauctionhouse.InvUtils;
 
+import com.earth2me.essentials.Essentials;
 import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums.NBT;
@@ -12,9 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 public class InventoryCreation {
 
     private static Map<AuctionCategories, ItemStack> itemCategories = new HashMap<AuctionCategories, ItemStack>(){{
@@ -31,6 +31,8 @@ public class InventoryCreation {
         put(AuctionCategories.MISC, createItem(Material.LAVA_BUCKET, "Miscellaneous"));
 
     }};
+    public static final int[] itemPlaces = {11, 12, 13, 14, 20, 21, 22, 23, 29, 30, 31, 32, 38, 39, 40, 41};
+    public static final int[] categoryPlaces = {9, 18, 27, 36};
 
 
     public static Inventory createAuctionHousePage(AuctionHouseInventory info){
@@ -54,6 +56,23 @@ public class InventoryCreation {
         inventory.setItem(25, filters);
         inventory.setItem(26, createItem(Material.NAME_TAG, "Search by Name", NBT.SEARCH+"~"+NBT.NAME));
         inventory.setItem(34, createItem(Material.BOOKSHELF, ChatColor.AQUA+"Auction Information"));
+        inventory.setItem(53, createItem(Material.PAPER, "Balance: "+
+                ChatColor.GREEN+"$" +Essentials.getPlugin(Essentials.class).getUser(info.getPlayer()).getMoney()));
+
+        final Iterator<ItemStack> iterator = Arrays.asList(itemCategories.get(AuctionCategories.ALL), itemCategories.get(AuctionCategories.BUILDINGBLOCKS),
+                itemCategories.get(AuctionCategories.DECORATIONS), itemCategories.get(AuctionCategories.REDSTONE)).iterator();
+        for (int categoryPlace : categoryPlaces) {
+            inventory.setItem(categoryPlace, iterator.next());
+        }
+
+        for (int itemPlace : itemPlaces) {
+            inventory.setItem(itemPlace, createItem("160/4", "Empty Slot"));
+        }
+        for (int i = 0; i < inventory.getContents().length; i++) {
+            if(inventory.getContents()[i] == null)
+                inventory.setItem(i, new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 15));
+        }
+
         return inventory;
     }
 
