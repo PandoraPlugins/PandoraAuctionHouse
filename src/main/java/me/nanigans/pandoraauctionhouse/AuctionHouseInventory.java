@@ -3,6 +3,8 @@ package me.nanigans.pandoraauctionhouse;
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import me.nanigans.pandoraauctionhouse.Classifications.InventoryType;
 import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
+import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
+import me.nanigans.pandoraauctionhouse.InvUtils.InventoryActionUtils;
 import me.nanigans.pandoraauctionhouse.InvUtils.InventoryActions;
 import me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
@@ -11,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -54,22 +57,43 @@ public class AuctionHouseInventory implements Listener {
 
         if(event.getInventory().equals(this.inventory)){
             event.setCancelled(true);
-            ((Player) event.getWhoClicked()).playSound(this.player.getLocation(), Sound.valueOf("CLICK"), 2, 1);
             final ItemStack currentItem = event.getCurrentItem();
-            if(currentItem != null) {
-                if(NBTData.containsNBT(currentItem, "METHOD")) {
-                    String method = NBTData.getNBT(currentItem, "METHOD");
-                    this.lastClicked = currentItem;
-                    try {
-                        InventoryActions.class.getMethod(method, AuctionHouseInventory.class).invoke(new InventoryActions(), this);
-                    }catch(NoSuchMethodException | NoClassDefFoundError | IllegalAccessException | InvocationTargetException ignored){
-                    }catch(Exception e){
-                        e.printStackTrace();
+            if(event.getAction().toString().contains("PICKUP")) {
+                ((Player) event.getWhoClicked()).playSound(this.player.getLocation(), Sound.valueOf("CLICK"), 2, 1);
+                if (currentItem != null) {
+                    if (NBTData.containsNBT(currentItem, "METHOD")) {
+                        String method = NBTData.getNBT(currentItem, "METHOD");
+                        this.lastClicked = currentItem;
+                        try {
+                            InventoryActions.class.getMethod(method, AuctionHouseInventory.class).invoke(new InventoryActions(), this);
+                        } catch (NoSuchMethodException | NoClassDefFoundError | IllegalAccessException | InvocationTargetException ignored) {
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
+
+                }
+            }else if(event.getAction().toString().contains("DROP")){
+                if(currentItem != null){
+
+                    String data = NBTData.getNBT(currentItem, "SETCATEGORY");
+                    if(data != null){
+
+                        AuctionCategories category = AuctionCategories.valueOf(data);
+                        if(category == AuctionCategories.ALL){
+                            for(AuctionCategories cate : AuctionCategories.values())
+                            ConfigUtils.removePlayerListing(this, cate);
+                        }else {
+                            String msg = ConfigUtils.removePlayerListing(this, category);
+                            if(msg != null) this.player.sendMessage(msg);
+                        }
+
+
+                    }
+
                 }
 
             }
-
         }
 
     }

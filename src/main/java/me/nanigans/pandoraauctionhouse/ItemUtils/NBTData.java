@@ -38,6 +38,19 @@ public class NBTData {
         return null;
     }
 
+    public static ItemStack removeNBT(ItemStack item, String key){
+
+        if(containsNBT(item, key)){
+
+            net.minecraft.server.v1_8_R3.ItemStack stack = CraftItemStack.asNMSCopy(item);
+
+            stack.getTag().remove(key);
+            item = CraftItemStack.asCraftMirror(stack);
+
+        }
+        return item;
+    }
+
     /**
      * Sets item nbt data
      * @param item the item to set it to

@@ -25,6 +25,10 @@ import static me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation.itemPla
 public class InventoryActions {
 
 
+    /**
+     * Shows all of the listings by the player
+     * @param info
+     */
     public static void playerListings(AuctionHouseInventory info){
 
         File file = new File(info.getPlugin().path+"/Categories/"+info.getCategory());
@@ -43,8 +47,13 @@ public class InventoryActions {
         InventoryActionUtils.clearItemBoard(info);
         Iterator<Integer> iterator = Arrays.stream(itemPlaces).iterator();
         for(int i = info.getPage()*playerLists.size(); i < playerLists.size()*(info.getPage()+1); i++){
-            if(playerLists.size() > i && iterator.hasNext())
-                info.getInventory().setItem(iterator.next(), createItem(playerLists.get(i), null, "METHOD~openMaterial"));
+            if(playerLists.size() > i && iterator.hasNext()) {
+                ItemStack item = createItem(playerLists.get(i), null, "METHOD~openMaterial");
+                ItemMeta meta = item.getItemMeta();
+                meta.setLore(Arrays.asList("Press Q to delete all your", "listings under this item"));
+                item.setItemMeta(meta);
+                info.getInventory().setItem(iterator.next(), item);
+            }
             else break;
         }
     }

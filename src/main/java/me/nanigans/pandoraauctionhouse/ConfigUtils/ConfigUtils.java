@@ -1,25 +1,91 @@
 package me.nanigans.pandoraauctionhouse.ConfigUtils;
 
+import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
+import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums;
+import me.nanigans.pandoraauctionhouse.ItemUtils.ItemData;
+import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
 import me.nanigans.pandoraauctionhouse.PandoraAuctionHouse;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ConfigUtils {
 
+    public static String removePlayerListing(AuctionHouseInventory info, AuctionCategories category){
+
+        File file = new File(info.getPlugin().path+"/Categories/"+category);
+        final File[] materialFiles = file.listFiles();
+        if(materialFiles != null){
+        for (File materialFile : materialFiles) {
+            if(materialFile.isDirectory()) {
+                if (Arrays.stream(materialFile.list()).anyMatch(i -> i.contains(info.getPlayer().getUniqueId().toString()))) {
+
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+
+                            final List<File> collect = Arrays.stream(materialFile.listFiles())
+                                    .filter(i -> i.getName().contains(info.getPlayer().getUniqueId().toString())).collect(Collectors.toList());
+                            for (File value : collect) {
+
+                                YamlGenerator yaml = new YamlGenerator(value.getAbsolutePath());
+                                final FileConfiguration data = yaml.getData();
+                                final List<ItemStack> selling = (List<ItemStack>) data.getList("selling");
+                                for (ItemStack itemStack : selling) {
+                                    if (NBTData.containsNBT(itemStack, NBTEnums.NBT.ENCHANTS.toString())) {
+
+                                        Map<Enchantment, Integer> enchants = ItemData.parseEnchantNBT(NBTData.getNBT(itemStack, NBTEnums.NBT.ENCHANTS.toString()));
+                                        itemStack.addEnchantments(enchants);
+                                        itemStack = NBTData.removeNBT(itemStack, NBTEnums.NBT.ENCHANTS.toString());
+                                    }
+                                    if (category != AuctionCategories.ALL && !info.getPlayer().getInventory().addItem(itemStack).isEmpty())
+                                        info.getPlayer().getWorld().dropItem(info.getPlayer().getLocation(), itemStack);
+
+                                }
+
+                                value.delete();
+                                if (materialFile.list() != null && materialFile.list().length == 0)
+                                    materialFile.delete();
+                            }
+
+                        }
+                    }.runTaskAsynchronously(info.getPlugin());
+
+                }else{
+                    return ChatColor.RED+"You are not selling anything in this category";
+                }
+            }
+
+            }
+        }else{
+            return ChatColor.RED+"Couldn't find any materials in this category";
+        }
+        return null;
+
+    }
+
+    /**
+     * Creates a new directory with respect to the path
+     * @param path the path to make the directory
+     * @throws IOException error for when it fails
+     */
     public static void createAHConfigFolder(String path) throws IOException {
         PandoraAuctionHouse plugin = PandoraAuctionHouse.getPlugin(PandoraAuctionHouse.class);
 
