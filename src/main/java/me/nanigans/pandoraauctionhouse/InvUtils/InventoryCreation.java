@@ -19,17 +19,17 @@ import java.util.*;
 public class InventoryCreation {
 
     public static final LinkedHashMap<AuctionCategories, ItemStack> itemCategories = new LinkedHashMap<AuctionCategories, ItemStack>(){{
-                put(AuctionCategories.ALL, createItem(Material.NETHER_STAR, "All", "METHOD~categoryAll"));
-                put(AuctionCategories.BUILDINGBLOCKS, createItem(Material.BRICK, "Building Blocks", "METHOD~categoryBuilding"));
-                put(AuctionCategories.DECORATIONS, createItem("175/5", "Decorations", "METHOD~categoryDecor"));
-                put(AuctionCategories.REDSTONE, createItem(Material.REDSTONE, "Redstone", "METHOD~categoryRedstone"));
-                put(AuctionCategories.TRANSPORTATION, createItem(Material.POWERED_RAIL, "Transportation", "METHOD~categoryTransport"));
-                put(AuctionCategories.FOOD, createItem(Material.APPLE, "Food", "METHOD~categoryFood"));
-                put(AuctionCategories.TOOLS, createItem(Material.IRON_AXE, "Tools", "METHOD~categoryTools"));
-                put(AuctionCategories.COMBAT, createItem(Material.GOLD_SWORD, "Combat", "METHOD~categoryCombat"));
-                put(AuctionCategories.BREWING, createItem(Material.POTION, "Brewing", "METHOD~categoryBrewing"));
-                put(AuctionCategories.MATERIALS, createItem(Material.STICK, "Materials", "METHOD~categoryMaterials"));
-                put(AuctionCategories.MISC, createItem(Material.LAVA_BUCKET, "Miscellaneous", "METHOD~categoryMisc"));
+                put(AuctionCategories.ALL, createItem(Material.NETHER_STAR, "All", "METHOD~categoryAll", "SETCATEGORY~"+AuctionCategories.ALL));
+                put(AuctionCategories.BUILDINGBLOCKS, createItem(Material.BRICK, "Building Blocks", "METHOD~categoryChange", "SETCATEGORY~"+AuctionCategories.BUILDINGBLOCKS));
+                put(AuctionCategories.DECORATIONS, createItem("175/5", "Decorations", "METHOD~categoryChange", "SETCATEGORY~"+AuctionCategories.DECORATIONS));
+                put(AuctionCategories.REDSTONE, createItem(Material.REDSTONE, "Redstone", "METHOD~categoryChange", "SETCATEGORY~"+AuctionCategories.REDSTONE));
+                put(AuctionCategories.TRANSPORTATION, createItem(Material.POWERED_RAIL, "Transportation", "METHOD~categoryChange", "SETCATEGORY~"+AuctionCategories.TRANSPORTATION));
+                put(AuctionCategories.FOOD, createItem(Material.APPLE, "Food", "METHOD~categoryChange", "SETCATEGORY~"+AuctionCategories.FOOD));
+                put(AuctionCategories.TOOLS, createItem(Material.IRON_AXE, "Tools", "METHOD~categoryChange", "SETCATEGORY~"+AuctionCategories.TOOLS));
+                put(AuctionCategories.COMBAT, createItem(Material.GOLD_SWORD, "Combat", "METHOD~categoryChange", "SETCATEGORY~"+AuctionCategories.COMBAT));
+                put(AuctionCategories.BREWING, createItem(Material.POTION, "Brewing", "METHOD~categoryChange", "SETCATEGORY~"+AuctionCategories.BREWING));
+                put(AuctionCategories.MATERIALS, createItem(Material.STICK, "Materials", "METHOD~categoryChange", "SETCATEGORY~"+AuctionCategories.MATERIALS));
+                put(AuctionCategories.MISC, createItem(Material.LAVA_BUCKET, "Miscellaneous", "METHOD~categoryChange", "SETCATEGORY~"+AuctionCategories.MISC));
 
             }};
     public static final int[] itemPlaces = {11, 12, 13, 14, 20, 21, 22, 23, 29, 30, 31, 32, 38, 39, 40, 41};
@@ -44,11 +44,11 @@ public class InventoryCreation {
     public static Inventory createAuctionHousePage(AuctionHouseInventory info){
 
         Inventory inventory = Bukkit.createInventory(info.getPlayer(), 54, "Auction House");
-        inventory.setItem(0, createItem("160/14", "Up", "METHOD~categoryUp"));
-        inventory.setItem(45, createItem("160/5", "Down", "METHOD~categoryDown"));
+        inventory.setItem(0, createItem("160/14", "Up", "METHOD~categoryUp"));//
+        inventory.setItem(45, createItem("160/5", "Down", "METHOD~categoryDown"));//
 
-        inventory.setItem(47, createItem("160/14", "Back", "METHOD~pageBack"));
-        inventory.setItem(50, createItem("160/5", "Forward", "METHOD~pageForward"));
+        inventory.setItem(47, createItem("160/14", "Back", "METHOD~pageBack"));//
+        inventory.setItem(50, createItem("160/5", "Forward", "METHOD~pageForward"));//
         ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
         SkullMeta meta = ((SkullMeta) head.getItemMeta());
         meta.setOwner(info.getPlayer().getName());
@@ -56,9 +56,9 @@ public class InventoryCreation {
         head.setItemMeta(meta);
         inventory.setItem(16, head);
 
-        ItemStack filters = createItem(Material.DIAMOND, "Sort By:", NBT.SORTBY+"~"+NBT.NEWEST, "METHOD~sortyBy");
+        ItemStack filters = createItem(Material.DIAMOND, "Sort By:", NBT.SORTBY+"~"+NBT.A_Z, "METHOD~sortyBy");
         ItemMeta itemMeta = filters.getItemMeta();
-        itemMeta.setLore(Arrays.asList(ChatColor.GOLD+"Newest", ChatColor.GRAY+"Oldest"));
+        itemMeta.setLore(Arrays.asList(ChatColor.GOLD+"A-Z", ChatColor.GRAY+"Z-A"));
         filters.setItemMeta(itemMeta);
         inventory.setItem(25, filters);
 

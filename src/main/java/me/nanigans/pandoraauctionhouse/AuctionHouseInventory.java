@@ -13,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -26,6 +27,7 @@ public class AuctionHouseInventory implements Listener {
     private byte categoryFirst = 0;
     private AuctionCategories category = AuctionCategories.ALL;
     private InventoryType invType = InventoryType.MAIN;
+    private ItemStack lastClicked;
 
     public AuctionHouseInventory(Player player){
 
@@ -44,11 +46,11 @@ public class AuctionHouseInventory implements Listener {
         if(event.getInventory().equals(this.inventory)){
             event.setCancelled(true);
             ((Player) event.getWhoClicked()).playSound(this.player.getLocation(), Sound.valueOf("CLICK"), 2, 1);
-
-            if(event.getCurrentItem() != null) {
-                if(NBTData.containsNBT(event.getCurrentItem(), "METHOD")) {
-                    String method = NBTData.getNBT(event.getCurrentItem(), "METHOD");
-
+            final ItemStack currentItem = event.getCurrentItem();
+            if(currentItem != null) {
+                if(NBTData.containsNBT(currentItem, "METHOD")) {
+                    String method = NBTData.getNBT(currentItem, "METHOD");
+                    this.lastClicked = currentItem;
                     try {
                         InventoryActions.class.getMethod(method, AuctionHouseInventory.class).invoke(new InventoryActions(), this);
                     }catch(NoSuchMethodException | NoClassDefFoundError | IllegalAccessException | InvocationTargetException ignored){
@@ -80,6 +82,10 @@ public class AuctionHouseInventory implements Listener {
         this.player.openInventory(newInv);
         this.swappingInvs = false;
 
+    }
+
+    public ItemStack getLastClicked() {
+        return lastClicked;
     }
 
     public InventoryType getInvType() {

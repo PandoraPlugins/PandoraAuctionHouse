@@ -1,7 +1,9 @@
 package me.nanigans.pandoraauctionhouse.InvUtils;
 
 import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
+import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
+import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -15,6 +17,22 @@ import static me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation.itemPla
 
 public class InventoryActions {
 
+
+    /**
+     * Changes the category topic to the item clicked
+     * @param info auction house info
+     */
+    public static void categoryChange(AuctionHouseInventory info){
+        ItemStack item = info.getLastClicked();
+        if(item != null){
+            String data = NBTData.getNBT(item, "SETCATEGORY");
+            if(data != null){
+                info.setCategory(AuctionCategories.valueOf(data));
+                InventoryActionUtils.replaceCategory(info);
+            }
+        }
+
+    }
     /**
      * Moves the category list down
      * @param info info about auctionhouse
@@ -42,7 +60,6 @@ public class InventoryActions {
         for (int i = info.getCategoryFirst(); i < info.getCategoryFirst()+InventoryCreation.categoryPlaces.length; i++) {//category items
             info.getInventory().setItem(iterator.next(), (ItemStack) objects[i]);
         }
-
     }
 
     /**

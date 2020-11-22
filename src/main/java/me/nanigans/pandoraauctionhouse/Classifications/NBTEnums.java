@@ -14,7 +14,9 @@ public class NBTEnums {
         OLDEST,
         SEARCH,
         NAME,
-        PLAYER
+        PLAYER,
+        A_Z,
+        Z_A
     }
 
 }
