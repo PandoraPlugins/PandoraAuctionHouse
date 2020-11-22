@@ -75,8 +75,10 @@ public class InventoryCreation {
         List<Material> materialList = ConfigUtils.getMaterialsFromCategory(info.getCategory());//item listings by material
 
         iterator = Arrays.stream(itemPlaces).iterator();
-        for(int i = info.getPage(); i < materialList.size()*(info.getPage()+1); i++){
+        for(int i = info.getPage()*materialList.size(); i < materialList.size()*(info.getPage()+1); i++){
+            if(materialList.size() > i)
                 inventory.setItem(iterator.next(), new ItemStack(materialList.get(i)));
+            else break;
         }
 
         for (int itemPlace : itemPlaces) {//empty slots
