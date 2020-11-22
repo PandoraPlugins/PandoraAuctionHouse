@@ -4,6 +4,7 @@ import com.earth2me.essentials.Essentials;
 import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums.NBT;
+import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
 import org.bukkit.Bukkit;
@@ -56,9 +57,11 @@ public class InventoryCreation {
         head.setItemMeta(meta);
         inventory.setItem(16, head);
 
-        ItemStack filters = createItem(Material.DIAMOND, "Sort By:", NBT.SORTBY+"~"+NBT.A_Z, "METHOD~sortyBy");
+        ItemStack filters = createItem(Material.DIAMOND, "Sort By:", NBT.SORTBY+"~"+NBT.A_Z, "METHOD~sortBy");
+
         ItemMeta itemMeta = filters.getItemMeta();
-        itemMeta.setLore(Arrays.asList(ChatColor.GOLD+"A-Z", ChatColor.GRAY+"Z-A"));
+        itemMeta.setLore(Arrays.asList((info.getSorted() == Sorted.A_Z ? ChatColor.GOLD : ChatColor.GRAY)+"A-Z",
+                (info.getSorted() == Sorted.Z_A ? ChatColor.GOLD : ChatColor.GRAY)+"Z-A"));
         filters.setItemMeta(itemMeta);
         inventory.setItem(25, filters);
 
@@ -72,12 +75,13 @@ public class InventoryCreation {
             inventory.setItem(iterator.next(), (ItemStack) itemCategories.values().toArray()[i]);
         }
 
-        List<Material> materialList = ConfigUtils.getMaterialsFromCategory(info.getCategory());//item listings by material
+        List<String> materialList = InventoryActionUtils.sortByAlphabetical(
+                ConfigUtils.getMaterialsFromCategory(info.getCategory()), info.getSorted() == Sorted.Z_A);//item listings by material
 
         iterator = Arrays.stream(itemPlaces).iterator();
         for(int i = info.getPage()*materialList.size(); i < materialList.size()*(info.getPage()+1); i++){
             if(materialList.size() > i && iterator.hasNext())
-                inventory.setItem(iterator.next(), createItem(materialList.get(i), null, "METHOD~openMaterial"));
+                inventory.setItem(iterator.next(), createItem(Material.valueOf(materialList.get(i)), null, "METHOD~openMaterial"));
             else break;
         }
 

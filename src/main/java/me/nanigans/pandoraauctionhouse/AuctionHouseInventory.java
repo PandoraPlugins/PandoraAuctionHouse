@@ -2,6 +2,7 @@ package me.nanigans.pandoraauctionhouse;
 
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import me.nanigans.pandoraauctionhouse.Classifications.InventoryType;
+import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
 import me.nanigans.pandoraauctionhouse.InvUtils.InventoryActions;
 import me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
@@ -28,6 +29,7 @@ public class AuctionHouseInventory implements Listener {
     private AuctionCategories category = AuctionCategories.ALL;
     private InventoryType invType = InventoryType.MAIN;
     private ItemStack lastClicked;
+    private Sorted sorted = Sorted.A_Z;
 
     public AuctionHouseInventory(Player player){
 
@@ -86,6 +88,14 @@ public class AuctionHouseInventory implements Listener {
         this.player.openInventory(newInv);
         this.swappingInvs = false;
 
+    }
+
+    public Sorted getSorted() {
+        return sorted;
+    }
+
+    public void setSorted(Sorted sorted) {
+        this.sorted = sorted;
     }
 
     public ItemStack getLastClicked() {

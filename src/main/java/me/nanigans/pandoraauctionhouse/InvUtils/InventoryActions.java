@@ -2,6 +2,7 @@ package me.nanigans.pandoraauctionhouse.InvUtils;
 
 import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
+import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
 import org.bukkit.Material;
@@ -17,6 +18,11 @@ import static me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation.itemPla
 
 public class InventoryActions {
 
+    public static void sortBy(AuctionHouseInventory info){
+
+
+
+    }
 
     /**
      * Changes the category topic to the item clicked
@@ -34,7 +40,6 @@ public class InventoryActions {
                 }
             }
         }
-
     }
     /**
      * Moves the category list down
@@ -70,7 +75,8 @@ public class InventoryActions {
      * @param info auction house info
      */
     public static void pageForward(AuctionHouseInventory info){
-        List<Material> materialList = ConfigUtils.getMaterialsFromCategory(info.getCategory());//item listings by material
+        List<String> materialList = InventoryActionUtils.sortByAlphabetical(
+                ConfigUtils.getMaterialsFromCategory(info.getCategory()), info.getSorted() == Sorted.Z_A);//item listings by material
 
         info.setPage((int) Math.min(Math.floor((double)materialList.size()/itemPlaces.length), info.getPage()+1));
 
@@ -80,7 +86,7 @@ public class InventoryActions {
         Iterator<Integer> iterator = Arrays.stream(itemPlaces).iterator();
         for(int i = info.getPage()*itemPlaces.length; i < materialList.size()*(info.getPage()+1); i++){
             if(materialList.size() > i && iterator.hasNext())
-                info.getInventory().setItem(iterator.next(), createItem(materialList.get(i), null, "METHOD~openMaterial"));
+                info.getInventory().setItem(iterator.next(), createItem(Material.valueOf(materialList.get(i)), null, "METHOD~openMaterial"));
             else break;
         }
     }
@@ -90,7 +96,8 @@ public class InventoryActions {
      * @param info auction house info
      */
     public static void pageBack(AuctionHouseInventory info){
-        List<Material> materialList = ConfigUtils.getMaterialsFromCategory(info.getCategory());//item listings by material
+        List<String> materialList = InventoryActionUtils.sortByAlphabetical(
+                ConfigUtils.getMaterialsFromCategory(info.getCategory()), info.getSorted() == Sorted.Z_A);//item listings by material
         info.setPage(info.getPage()-1);
 
         for (int itemPlace : itemPlaces) {
@@ -99,7 +106,7 @@ public class InventoryActions {
         Iterator<Integer> iterator = Arrays.stream(itemPlaces).iterator();
         for(int i = info.getPage()*itemPlaces.length; i < materialList.size()*(info.getPage()+1); i++){
             if(materialList.size() > i && iterator.hasNext())
-                info.getInventory().setItem(iterator.next(), createItem(materialList.get(i), null, "METHOD~openMaterial"));
+                info.getInventory().setItem(iterator.next(), createItem(Material.valueOf(materialList.get(i)), null, "METHOD~openMaterial"));
             else break;
         }
 
