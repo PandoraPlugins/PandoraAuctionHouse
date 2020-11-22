@@ -13,6 +13,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -30,6 +31,8 @@ public class AuctionHouseInventory implements Listener {
     private InventoryType invType = InventoryType.MAIN;
     private ItemStack lastClicked;
     private Sorted sorted = Sorted.A_Z;
+    private volatile String message;
+    private boolean isTyping;
 
     public AuctionHouseInventory(Player player){
 
@@ -81,6 +84,19 @@ public class AuctionHouseInventory implements Listener {
         }
     }
 
+    @EventHandler
+    public void chat(AsyncPlayerChatEvent event){
+
+        if(event.getPlayer().getUniqueId().equals(this.getPlayer().getUniqueId()) && this.isTyping){
+
+            this.message = event.getMessage();
+            this.isTyping = false;
+            event.setCancelled(true);
+
+        }
+
+    }
+
     public void swapInvs(Inventory newInv){
 
         this.inventory = newInv;
@@ -88,6 +104,30 @@ public class AuctionHouseInventory implements Listener {
         this.player.openInventory(newInv);
         this.swappingInvs = false;
 
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public boolean isTyping() {
+        return isTyping;
+    }
+
+    public void setTyping(boolean typing) {
+        isTyping = typing;
+    }
+
+    public boolean isSwappingInvs() {
+        return swappingInvs;
+    }
+
+    public void setSwappingInvs(boolean swappingInvs) {
+        this.swappingInvs = swappingInvs;
     }
 
     public Sorted getSorted() {

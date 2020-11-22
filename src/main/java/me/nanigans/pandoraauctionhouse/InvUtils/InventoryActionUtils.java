@@ -3,6 +3,7 @@ package me.nanigans.pandoraauctionhouse.InvUtils;
 import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
 import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
+import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 import org.bukkit.Material;
 
 import java.util.Arrays;
@@ -22,9 +23,6 @@ public class InventoryActionUtils {
      */
     public static void replaceCategory(AuctionHouseInventory info){
 
-        for (int itemPlace : itemPlaces) {
-            info.getInventory().setItem(itemPlace, createItem("160/4", "Empty Slot"));
-        }
         info.setPage(0);
         List<String> materialList = InventoryActionUtils.sortByAlphabetical(
                 ConfigUtils.getMaterialsFromCategory(info.getCategory()), info.getSorted() == Sorted.Z_A);//item listings by material
@@ -38,11 +36,32 @@ public class InventoryActionUtils {
 
     }
 
-
     public static <T> List<String> sortByAlphabetical(List<T> list, boolean inverse){
         List<String> stringified = list.stream().map(Object::toString).sorted().collect(Collectors.toList());
         if(inverse) Collections.reverse(stringified);
         return stringified;
+    }
+
+    public static void replaceByItems(AuctionHouseInventory info, List<ExtractedResult> list){
+
+        clearItemBoard(info);
+        Iterator<Integer> iterator = Arrays.stream(itemPlaces).iterator();
+        for(int i = info.getPage()*list.size(); i < list.size()*(info.getPage()+1); i++){
+            if(list.size() > i && iterator.hasNext())
+                info.getInventory().setItem(iterator.next(), createItem(Material.valueOf(list.get(i).getString()), null, "METHOD~openMaterial"));
+            else break;
+        }
+
+        info.swapInvs(info.getInventory());
+
+    }
+
+    public static void clearItemBoard(AuctionHouseInventory info){
+
+        for (int itemPlace : itemPlaces) {
+            info.getInventory().setItem(itemPlace, createItem("160/4", "Empty Slot"));
+        }
+
     }
 
 }

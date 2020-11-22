@@ -65,7 +65,7 @@ public class InventoryCreation {
         filters.setItemMeta(itemMeta);
         inventory.setItem(25, filters);
 
-        inventory.setItem(26, createItem(Material.NAME_TAG, "Search by Name", "METHOD~search"));
+        inventory.setItem(26, createItem(Material.NAME_TAG, "Search By Item Name", "METHOD~searchByItem"));
         inventory.setItem(34, createItem(Material.BOOKSHELF, ChatColor.AQUA+"Auction Information"));
         inventory.setItem(53, createItem(Material.PAPER, "Balance: "+
                 ChatColor.GREEN+"$" +Essentials.getPlugin(Essentials.class).getUser(info.getPlayer()).getMoney()));
