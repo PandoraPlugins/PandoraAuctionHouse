@@ -1,11 +1,8 @@
 package me.nanigans.pandoraauctionhouse.ItemUtils;
 
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
-import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.List;
 
 public class NBTData {
 
@@ -13,8 +10,6 @@ public class NBTData {
 
         try {
             net.minecraft.server.v1_8_R3.ItemStack stack = CraftItemStack.asNMSCopy(item);
-
-            final List<String> strings = MaterialKeys.Material_Keys.get(Material.STONE);
 
             if (stack.hasTag()) {
                 NBTTagCompound tag = stack.getTag();
@@ -31,13 +26,13 @@ public class NBTData {
         }
     }
 
-    public static Object getNBT(ItemStack item, String key){
+    public static String getNBT(ItemStack item, String key){
 
         if(containsNBT(item, key)){
 
             net.minecraft.server.v1_8_R3.ItemStack stack = CraftItemStack.asNMSCopy(item);
 
-            return stack.getTag().get(key);
+            return stack.getTag().get(key).toString().replaceAll("\"", "");
 
         }
         return null;

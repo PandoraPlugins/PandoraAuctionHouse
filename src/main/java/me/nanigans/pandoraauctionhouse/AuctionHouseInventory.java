@@ -1,7 +1,10 @@
 package me.nanigans.pandoraauctionhouse;
 
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
+import me.nanigans.pandoraauctionhouse.InvUtils.InventoryActions;
 import me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation;
+import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -9,6 +12,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+
+import java.lang.reflect.InvocationTargetException;
 
 public class AuctionHouseInventory implements Listener {
 
@@ -27,15 +32,29 @@ public class AuctionHouseInventory implements Listener {
         this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
         Inventory inventory = InventoryCreation.createAuctionHousePage(this);
         player.openInventory(inventory);
+        this.inventory = inventory;
 
 
     }
 
     @EventHandler
-    public void onInvClick(InventoryClickEvent event){
+    public void onInvClick(InventoryClickEvent event) {
 
         if(event.getInventory().equals(this.inventory)){
             event.setCancelled(true);
+            ((Player) event.getWhoClicked()).playSound(this.player.getLocation(), Sound.valueOf("CLICK"), 2, 1);
+
+            if(event.getCurrentItem() != null) {
+                if(NBTData.containsNBT(event.getCurrentItem(), "METHOD")) {
+                    String method = NBTData.getNBT(event.getCurrentItem(), "METHOD");
+
+                    try {
+                        InventoryActions.class.getMethod(method, AuctionHouseInventory.class).invoke(new InventoryActions(), this);
+                    }catch(NoSuchMethodException | NoClassDefFoundError | IllegalAccessException | InvocationTargetException ignored){
+                    }
+                }
+
+            }
 
         }
 
@@ -65,7 +84,7 @@ public class AuctionHouseInventory implements Listener {
     }
 
     public void setCategoryFirst(byte categoryFirst) {
-        this.categoryFirst = categoryFirst;
+        this.categoryFirst = (byte) Math.max(Math.min(InventoryCreation.itemCategories.size()-4, categoryFirst), 0);
     }
 
     public AuctionCategories getCategory() {
@@ -81,7 +100,7 @@ public class AuctionHouseInventory implements Listener {
     }
 
     public void setPage(int page) {
-        this.page = page;
+        this.page = Math.min(page, 0);
     }
 
     public Inventory getInventory() {
