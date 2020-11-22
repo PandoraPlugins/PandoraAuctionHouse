@@ -51,6 +51,8 @@ public class AuctionHouseInventory implements Listener {
                     try {
                         InventoryActions.class.getMethod(method, AuctionHouseInventory.class).invoke(new InventoryActions(), this);
                     }catch(NoSuchMethodException | NoClassDefFoundError | IllegalAccessException | InvocationTargetException ignored){
+                    }catch(Exception e){
+                        e.printStackTrace();
                     }
                 }
 
