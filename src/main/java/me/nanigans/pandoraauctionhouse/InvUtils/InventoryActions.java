@@ -15,10 +15,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.PrimitiveIterator;
+import java.io.File;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation.createItem;
@@ -29,8 +27,26 @@ public class InventoryActions {
 
     public static void playerListings(AuctionHouseInventory info){
 
+        File file = new File(info.getPlugin().path+"/Categories/"+info.getCategory());
+        List<Material> playerLists = new ArrayList<>();
+        for (File listFile : file.listFiles()) {
+            if(listFile.isDirectory()){
 
+                final String[] list = listFile.list();
+                if (Arrays.stream(list).anyMatch(i -> i.contains(info.getPlayer().getUniqueId().toString()))) {
+                    playerLists.add(Material.valueOf(listFile.getName()));
+                }
 
+            }
+        }
+
+        InventoryActionUtils.clearItemBoard(info);
+        Iterator<Integer> iterator = Arrays.stream(itemPlaces).iterator();
+        for(int i = info.getPage()*playerLists.size(); i < playerLists.size()*(info.getPage()+1); i++){
+            if(playerLists.size() > i && iterator.hasNext())
+                info.getInventory().setItem(iterator.next(), createItem(playerLists.get(i), null, "METHOD~openMaterial"));
+            else break;
+        }
     }
 
     /**
