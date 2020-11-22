@@ -9,7 +9,11 @@ import java.util.PrimitiveIterator;
 
 public class InventoryActions {
 
-public static void categoryDown(AuctionHouseInventory info){
+    /**
+     * Moves the category list down
+     * @param info info about auctionhouse
+     */
+    public static void categoryDown(AuctionHouseInventory info){
     info.setCategoryFirst((byte) (info.getCategoryFirst()+1));
     PrimitiveIterator.OfInt iterator = Arrays.stream(InventoryCreation.categoryPlaces).iterator();
     final Object[] objects = InventoryCreation.itemCategories.values().toArray();
@@ -17,12 +21,12 @@ public static void categoryDown(AuctionHouseInventory info){
         info.getInventory().setItem(iterator.next(), (ItemStack) objects[i]);
     }
 
-//    info.setCategoryFirst((byte) (info.getCategoryFirst()+1));
-//    Inventory inv = InventoryCreation.createAuctionHousePage(info);
-//    info.swapInvs(inv);
-
 }
 
+    /**
+     * Moves the category list up
+     * @param info info about auctionhouse
+     */
     public static void categoryUp(AuctionHouseInventory info){
 
         info.setCategoryFirst((byte) (info.getCategoryFirst()-1));

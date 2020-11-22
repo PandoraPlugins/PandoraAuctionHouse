@@ -1,6 +1,7 @@
 package me.nanigans.pandoraauctionhouse;
 
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
+import me.nanigans.pandoraauctionhouse.Classifications.InventoryType;
 import me.nanigans.pandoraauctionhouse.InvUtils.InventoryActions;
 import me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
@@ -24,6 +25,7 @@ public class AuctionHouseInventory implements Listener {
     private int page = 0;
     private byte categoryFirst = 0;
     private AuctionCategories category = AuctionCategories.ALL;
+    private InventoryType invType = InventoryType.MAIN;
 
     public AuctionHouseInventory(Player player){
 
@@ -79,6 +81,14 @@ public class AuctionHouseInventory implements Listener {
         this.player.openInventory(newInv);
         this.swappingInvs = false;
 
+    }
+
+    public InventoryType getInvType() {
+        return invType;
+    }
+
+    public void setInvType(InventoryType invType) {
+        this.invType = invType;
     }
 
     public byte getCategoryFirst() {
