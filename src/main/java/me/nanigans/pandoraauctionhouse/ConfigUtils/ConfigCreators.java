@@ -53,7 +53,7 @@ public class ConfigCreators {
      * Returns a {@link Map} representative of the passed Object that represents
      * a section of a YAML file. This method neglects the implementation of the
      * section (whether it be {@link ConfigurationSection} or just a
-     * {@link Map}), and returns the appropriate value.
+     * {@link Map}), and returns the appropriate value. 
      *
      * @since 0.1.0
      * @version 0.1.0
