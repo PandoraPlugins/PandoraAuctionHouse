@@ -11,7 +11,6 @@ import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -28,6 +27,16 @@ import static me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation.itemPla
 public class InventoryActions {
 
 
+    public static void playerListings(AuctionHouseInventory info){
+
+
+
+    }
+
+    /**
+     * Allows the player to seach for an item by its name
+     * @param info auctionhouse info
+     */
     public static void searchByItem(AuctionHouseInventory info){
 
         info.setSwappingInvs(true);
@@ -45,7 +54,7 @@ public class InventoryActions {
 
                     if(info.getMessage() != null){
 
-                        String message = info.getMessage();
+                        String message = info.getMessage();//TODO: possibly figure out how to get it by the actual item name and not material
                         final List<ExtractedResult> result = FuzzySearch.extractAll(message, ConfigUtils.getMaterialsFromCategory(info.getCategory())
                                 .stream().map(Enum::toString).collect(Collectors.toList())).stream().filter(i -> i.getScore() > 70).collect(Collectors.toList());
                         info.setMessage(null);
@@ -56,7 +65,7 @@ public class InventoryActions {
                             InventoryActionUtils.replaceByItems(info, result);
 
                         }else{
-                            info.getPlayer().sendMessage(ChatColor.RED+"Couldn't find any listed items matching your query");
+                            info.getPlayer().sendMessage(ChatColor.RED+"Couldn't find any listed items in the current category matching your query");
                             new BukkitRunnable() {
                                 @Override
                                 public void run() {
