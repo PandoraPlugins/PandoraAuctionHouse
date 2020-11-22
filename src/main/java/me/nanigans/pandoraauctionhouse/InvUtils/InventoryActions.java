@@ -27,8 +27,11 @@ public class InventoryActions {
         if(item != null){
             String data = NBTData.getNBT(item, "SETCATEGORY");
             if(data != null){
-                info.setCategory(AuctionCategories.valueOf(data));
-                InventoryActionUtils.replaceCategory(info);
+                final AuctionCategories auctionCategories = AuctionCategories.valueOf(data);
+                if(auctionCategories != info.getCategory()) {
+                    info.setCategory(auctionCategories);
+                    InventoryActionUtils.replaceCategory(info);
+                }
             }
         }
 

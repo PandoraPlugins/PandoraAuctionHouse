@@ -40,6 +40,10 @@ public class AuctionHouseInventory implements Listener {
 
     }
 
+    /**
+     * When inventory is clicked, it'll run the method the item has specified under METHOD NBT
+     * @param event InventoryClickEvent
+     */
     @EventHandler
     public void onInvClick(InventoryClickEvent event) {
 
