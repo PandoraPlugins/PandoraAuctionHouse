@@ -36,7 +36,6 @@ public class AuctionHouseInventory implements Listener {
         player.openInventory(inventory);
         this.inventory = inventory;
 
-
     }
 
     @EventHandler
@@ -112,7 +111,7 @@ public class AuctionHouseInventory implements Listener {
     }
 
     public void setPage(int page) {
-        this.page = Math.min(page, 0);
+        this.page = Math.max(page, 0);
     }
 
     public Inventory getInventory() {

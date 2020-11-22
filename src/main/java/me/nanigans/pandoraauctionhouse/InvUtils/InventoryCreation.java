@@ -76,7 +76,7 @@ public class InventoryCreation {
 
         iterator = Arrays.stream(itemPlaces).iterator();
         for(int i = info.getPage()*materialList.size(); i < materialList.size()*(info.getPage()+1); i++){
-            if(materialList.size() > i)
+            if(materialList.size() > i && iterator.hasNext())
                 inventory.setItem(iterator.next(), createItem(materialList.get(i), null, "METHOD~openMaterial"));
             else break;
         }
