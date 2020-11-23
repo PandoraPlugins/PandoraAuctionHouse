@@ -38,14 +38,14 @@ public class AuctionHouse implements CommandExecutor {
                             if(price >= 0) {
                                 if (item.getEnchantments().size() > 0) {
 
-//                                    try{
-//                                        final String s = item.toString();
-//                                    }catch(Exception ignored){
-//                                        item = NBTData.setNBT(item, NBT.ENCHANTS+"~"+ItemData.serializeEnchantment(item));
-//                                        for (Map.Entry<Enchantment, Integer> enchantmentIntegerEntry : item.getEnchantments().entrySet()) {
-//                                            item.removeEnchantment(enchantmentIntegerEntry.getKey());
-//                                        }
-//                                    }
+                                    try{
+                                        final String s = item.toString();
+                                    }catch(Exception ignored){
+                                        item = NBTData.setNBT(item, NBT.ENCHANTS+"~"+ItemData.serializeEnchantment(item));
+                                        for (Map.Entry<Enchantment, Integer> enchantmentIntegerEntry : item.getEnchantments().entrySet()) {
+                                            item.removeEnchantment(enchantmentIntegerEntry.getKey());
+                                        }
+                                    }
                                 }
 
                                 item = NBTData.setNBT(item,
