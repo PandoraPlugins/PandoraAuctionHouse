@@ -27,12 +27,13 @@ import java.util.stream.Collectors;
 import static me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation.createItem;
 
 @FunctionalInterface
-interface Method {
+interface MainMethods {
     void execute();
 }
 
 public class MainInventoryActions extends InventoryActions{
 
+    private final HashMap<String, MainMethods> mainMethods = new HashMap<>();
     public static final LinkedHashMap<AuctionCategories, ItemStack> itemCategories = new LinkedHashMap<AuctionCategories, ItemStack>(){{
         ItemStack item = createItem(Material.NETHER_STAR, "All", "METHOD~categoryChange", "SETCATEGORY~"+AuctionCategories.ALL);
         ItemMeta meta = item.getItemMeta();
@@ -57,15 +58,18 @@ public class MainInventoryActions extends InventoryActions{
 
     public MainInventoryActions(AuctionHouseInventory info) {
         super(info);
-        methods.put("openMaterial", this::openMaterial);
-        methods.put("categoryChange", this::categoryChange);
-        methods.put("categoryDown", this::categoryDown);
-        methods.put("categoryUp", this::categoryUp);
+        mainMethods.put("openMaterial", this::openMaterial);
+        mainMethods.put("categoryChange", this::categoryChange);
+        mainMethods.put("categoryDown", this::categoryDown);
+        mainMethods.put("categoryUp", this::categoryUp);
     }
 
     @Override
     public void click(String method) {
+        if(methods.containsKey(method))
         methods.get(method).execute();
+        else if(mainMethods.containsKey(method))
+            mainMethods.get(method).execute();
     }
 
 

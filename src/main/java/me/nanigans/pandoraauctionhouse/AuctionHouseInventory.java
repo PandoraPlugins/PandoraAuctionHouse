@@ -63,19 +63,15 @@ public class AuctionHouseInventory implements Listener {
             if(event.getAction().toString().contains("PICKUP")) {
                 ((Player) event.getWhoClicked()).playSound(this.player.getLocation(), Sound.valueOf("CLICK"), 2, 1);
                 if (currentItem != null) {
-                    if(this.invType == InventoryType.MAIN) {
-                        if (NBTData.containsNBT(currentItem, "METHOD")) {
-                            String method = NBTData.getNBT(currentItem, "METHOD");
-                            this.lastClicked = currentItem;
-                            try {
-                                if(this.invType == InventoryType.MAIN)
-                                    this.mainInventory.click(method);
-                                else if(this.invType == InventoryType.LISTINGS)
-                                    this.listingInventory.click(method);
-                            } catch (NoClassDefFoundError | Exception ignored) {
-                                ignored.printStackTrace();
-                            }
-                        }
+                    if (NBTData.containsNBT(currentItem, "METHOD")) {
+                        String method = NBTData.getNBT(currentItem, "METHOD");
+                        this.lastClicked = currentItem;
+
+                        if(this.invType == InventoryType.MAIN)
+                            this.mainInventory.click(method);
+                        else if(this.invType == InventoryType.LISTINGS)
+                            this.listingInventory.click(method);
+
                     }
                 }
             }else if(event.getAction().toString().contains("DROP")){
