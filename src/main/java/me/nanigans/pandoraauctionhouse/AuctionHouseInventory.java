@@ -5,7 +5,8 @@ import me.nanigans.pandoraauctionhouse.Classifications.InventoryType;
 import me.nanigans.pandoraauctionhouse.Classifications.ItemType;
 import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
-import me.nanigans.pandoraauctionhouse.InvUtils.InventoryActions;
+import me.nanigans.pandoraauctionhouse.InvUtils.ListingInventoryActions;
+import me.nanigans.pandoraauctionhouse.InvUtils.MainInventoryActions;
 import me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
 import org.bukkit.ChatColor;
@@ -38,6 +39,8 @@ public class AuctionHouseInventory implements Listener {
     private volatile String message;
     private boolean isTyping;
     private Material viewingMaterial;
+    private final MainInventoryActions mainInventory = new MainInventoryActions(this);
+    private final ListingInventoryActions listingInventory = new ListingInventoryActions(this);
 
     public AuctionHouseInventory(Player player){
 
@@ -63,17 +66,22 @@ public class AuctionHouseInventory implements Listener {
             if(event.getAction().toString().contains("PICKUP")) {
                 ((Player) event.getWhoClicked()).playSound(this.player.getLocation(), Sound.valueOf("CLICK"), 2, 1);
                 if (currentItem != null) {
-                    if (NBTData.containsNBT(currentItem, "METHOD")) {
-                        String method = NBTData.getNBT(currentItem, "METHOD");
-                        this.lastClicked = currentItem;
-                        try {
-                            InventoryActions.class.getMethod(method, AuctionHouseInventory.class).invoke(new InventoryActions(), this);
-                        } catch (NoSuchMethodException | NoClassDefFoundError | IllegalAccessException | InvocationTargetException ignored) {
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                    if(this.invType == InventoryType.MAIN) {
+                        if (NBTData.containsNBT(currentItem, "METHOD")) {
+                            String method = NBTData.getNBT(currentItem, "METHOD");
+                            this.lastClicked = currentItem;
+                            try {
+                                if(this.invType == InventoryType.MAIN)
+                                    this.mainInventory.click(method);
+                                else if(this.invType == InventoryType.LISTINGS)
+                                    this.listingInventory.click(method);
+                            } catch (NoClassDefFoundError | Exception ignored) {
+                                ignored.printStackTrace();
+                            }
                         }
-                    }
+                    }else if(this.invType == InventoryType.LISTINGS){
 
+                    }
                 }
             }else if(event.getAction().toString().contains("DROP")){
                 if(currentItem != null){
@@ -136,7 +144,7 @@ public class AuctionHouseInventory implements Listener {
     public void swapInvs(Inventory newInv){
         if(newInv == null) {
             this.player.closeInventory();
-            this.player.sendMessage(ChatColor.RED+"Something went wrong when swapping inventories");
+            this.player.sendMessage(ChatColor.RED+"Nothing is here");
         }else {
             this.inventory = newInv;
             this.swappingInvs = true;

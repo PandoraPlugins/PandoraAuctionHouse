@@ -1,14 +1,17 @@
 package me.nanigans.pandoraauctionhouse.ItemUtils;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.material.Skull;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,6 +21,31 @@ public class ItemData {
 
         DateFormat formatter = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
         return formatter.format(new Date(time));
+    }
+
+    public static ItemStack createPlaySkull(Player player){
+
+        ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
+        SkullMeta meta = ((SkullMeta) item.getItemMeta());
+        meta.setOwner(player.getName());
+        item.setItemMeta(meta);
+        return item;
+    }
+    public static ItemStack createPlaySkull(OfflinePlayer player){
+
+        ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
+        SkullMeta meta = ((SkullMeta) item.getItemMeta());
+        meta.setOwner(player.getName());
+        item.setItemMeta(meta);
+        return item;
+    }
+    public static ItemStack createPlaySkull(UUID uuid){
+
+        ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
+        SkullMeta meta = ((SkullMeta) item.getItemMeta());
+        meta.setOwner(Bukkit.getOfflinePlayer(uuid).getName());
+        item.setItemMeta(meta);
+        return item;
     }
 
     /**

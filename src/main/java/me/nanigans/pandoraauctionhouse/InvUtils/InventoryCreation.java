@@ -6,7 +6,6 @@ import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums;
 import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums.NBT;
 import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
-import me.nanigans.pandoraauctionhouse.Commands.AuctionHouse;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.YamlGenerator;
 import me.nanigans.pandoraauctionhouse.ItemUtils.ItemData;
@@ -17,7 +16,6 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -42,9 +40,23 @@ public class InventoryCreation {
         try {
             Inventory inv = Bukkit.createInventory(info.getPlayer(), invListingSize + 9, "Player Listings");
 
-            inv.setItem(inv.getSize() - 8, createItem(Material.BARRIER, ChatColor.RED + "Back", "BACK~back"));
-            inv.setItem(inv.getSize() - 7, createItem(Material.BARRIER, "Balance: $" + Essentials.getPlugin(Essentials.class).getUser(info.getPlayer()).getMoney()));
-            //inv.setItem(inv);
+            inv.setItem(inv.getSize() - 9, createItem(Material.BARRIER, ChatColor.RED + "Back", "METHOD~back"));
+            inv.setItem(inv.getSize() - 8, createItem(Material.PAPER, "Balance: "+ChatColor.GOLD+"$" + Essentials.getPlugin(Essentials.class).getUser(info.getPlayer()).getMoney()));
+            ItemStack item = ItemData.createPlaySkull(info.getPlayer());
+            ItemMeta meta = item.getItemMeta();
+            meta.setDisplayName("Your Listings");
+            item.setItemMeta(meta);
+            inv.setItem(inv.getSize()-5, NBTData.setNBT(item, "METHOD~getPlayerListings"));
+            inv.setItem(inv.getSize()-6, createItem(Material.COMPASS, "Page Backwards", "METHOD~pageBackwards"));
+            inv.setItem(inv.getSize()-4, createItem(Material.COMPASS, "Page Forward", "METHOD~pageForward"));
+            ItemStack sortBy = createItem(Material.DIAMOND, "Sort By:", "METHOD~sortBy");
+            meta = sortBy.getItemMeta();
+            meta.setLore(Arrays.asList(ChatColor.GOLD+"Newest", ChatColor.GRAY+"Oldest", ChatColor.GRAY+"A-Z",
+                    ChatColor.GRAY+"Z-A", ChatColor.GRAY+"Cheapest", ChatColor.GRAY+"Expensive"));
+            sortBy.setItemMeta(meta);
+
+            inv.setItem(inv.getSize()-2, sortBy);
+            inv.setItem(inv.getSize()-1, createItem(Material.NAME_TAG, "Search by player", "searchBy"));
 
             File matFile = new File(info.getPlugin().path + "Categories/" + info.getCategory() + "/" + info.getViewingMaterial());
             if (matFile.exists()) {
@@ -95,7 +107,7 @@ public class InventoryCreation {
             final long days = TimeUnit.DAYS.convert(time - currentTime, TimeUnit.MILLISECONDS);
             final long hours = TimeUnit.HOURS.convert((time - currentTime)%86400000, TimeUnit.MILLISECONDS);
             final long minutes = (time-currentTime)/(60 * 1000) % 60;
-            lore.add(ChatColor.GRAY + "Expires: " + ChatColor. + days+"D " + hours+"H "+minutes+"M");//ItemData.formatTime(time));
+            lore.add(ChatColor.GRAY + "Expires: " + ChatColor.WHITE + days+"D " + hours+"H "+minutes+"M");//ItemData.formatTime(time));
         }else lore.add(ChatColor.GRAY+"Expires: " + ChatColor.DARK_RED+"EXPIRED");
 
         OfflinePlayer seller = Bukkit.getOfflinePlayer(UUID.fromString(NBTData.getNBT(item, NBT.SELLER.toString())));
@@ -144,14 +156,14 @@ public class InventoryCreation {
         inventory.setItem(0, createItem("160/14", "Up", "METHOD~categoryUp"));//
         inventory.setItem(45, createItem("160/5", "Down", "METHOD~categoryDown"));//
 
-        inventory.setItem(47, createItem("160/14", "Back", "METHOD~pageBack"));//
+        inventory.setItem(47, createItem("160/14", "Back", "METHOD~pageBackwards"));//
         inventory.setItem(50, createItem("160/5", "Forward", "METHOD~pageForward"));//
         ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
         SkullMeta meta = ((SkullMeta) head.getItemMeta());
         meta.setOwner(info.getPlayer().getName());
         meta.setDisplayName("Your listings");
         head.setItemMeta(meta);
-        inventory.setItem(16, NBTData.setNBT(head, "METHOD~playerListings"));
+        inventory.setItem(16, NBTData.setNBT(head, "METHOD~getPlayerListings"));
 
         ItemStack filters = createItem(Material.DIAMOND, "Sort By:", NBT.SORTBY+"~"+Sorted.A_Z, "METHOD~sortBy");
 
@@ -161,7 +173,7 @@ public class InventoryCreation {
         filters.setItemMeta(itemMeta);
         inventory.setItem(25, filters);
 
-        inventory.setItem(26, createItem(Material.NAME_TAG, "Search By Item Name", "METHOD~searchByItem"));
+        inventory.setItem(26, createItem(Material.NAME_TAG, "Search By Item Name", "METHOD~searchBy"));
         inventory.setItem(34, createItem(Material.BOOKSHELF, ChatColor.AQUA+"Auction Information"));
         inventory.setItem(53, createItem(Material.PAPER, "Balance: "+
                 ChatColor.GREEN+"$" +Essentials.getPlugin(Essentials.class).getUser(info.getPlayer()).getMoney()));
