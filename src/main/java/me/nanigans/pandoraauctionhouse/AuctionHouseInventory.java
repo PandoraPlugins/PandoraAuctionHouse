@@ -79,8 +79,6 @@ public class AuctionHouseInventory implements Listener {
                                 ignored.printStackTrace();
                             }
                         }
-                    }else if(this.invType == InventoryType.LISTINGS){
-
                     }
                 }
             }else if(event.getAction().toString().contains("DROP")){

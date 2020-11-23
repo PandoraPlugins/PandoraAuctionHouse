@@ -1,6 +1,7 @@
 package me.nanigans.pandoraauctionhouse.InvUtils;
 
 import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
+import org.bukkit.inventory.Inventory;
 
 public abstract class InventoryActions {
     protected AuctionHouseInventory info;
@@ -15,6 +16,7 @@ public abstract class InventoryActions {
     public abstract void pageBackwards();
     public abstract void sortBy();
     public abstract void searchBy();
+    public abstract Inventory createInventory();
 
 
 }
