@@ -70,7 +70,6 @@ public class NBTData {
             String[] nbt = s.split("~");
             tag.setString(nbt[0], nbt[1]);
         }
-        System.out.println("tag = " + tag);
         stack.setTag((tag));
 
         item = CraftItemStack.asCraftMirror(stack);
@@ -89,7 +88,6 @@ public class NBTData {
 
             final Set<String> nbtKeys = tag.c();
 
-            System.out.println("nbtKeys = " + nbtKeys);
             Map<String, String> nbtMap = new HashMap<>();
 
             for (String nbtKey : nbtKeys) {

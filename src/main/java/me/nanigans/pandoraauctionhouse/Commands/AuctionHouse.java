@@ -47,6 +47,12 @@ public class AuctionHouse implements CommandExecutor {
                                         }
                                     }
                                 }
+                                try{
+                                    final String s = item.toString();
+                                }catch(Exception ignored){
+                                    player.sendMessage(ChatColor.RED+"This item cannot be sold");
+                                    return true;
+                                }
 
                                 item = NBTData.setNBT(item,
                                         NBT.PRICE + "~" + args[1],

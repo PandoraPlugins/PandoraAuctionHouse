@@ -25,6 +25,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class InventoryCreation {
 
@@ -87,12 +88,15 @@ public class InventoryCreation {
         ItemMeta meta = item.getItemMeta();
         List<String> lore = meta.getLore() == null ? new ArrayList<>() : meta.getLore();
         lore.add(ChatColor.GRAY+"Price: "+ChatColor.GOLD+"$"+NBTData.getNBT(item, NBT.PRICE.toString()));
-        System.out.println("NBTData.getNBT(item, NBT.DATEEXPIRE.toString()) = " + NBTData.getNBT(item, NBT.DATEEXPIRE.toString()));
-        final long time = Long.parseLong(NBTData.getNBT(item, NBT.DATEEXPIRE.toString()));
 
-        if(time > new Date().getTime())
-        lore.add(ChatColor.GRAY+"Expires: " +ChatColor.BLUE+ ItemData.formatTime(time));
-        else lore.add(ChatColor.GRAY+"Expires: " + ChatColor.DARK_RED+"EXPIRED");
+        final long time = Long.parseLong(NBTData.getNBT(item, NBT.DATEEXPIRE.toString()));
+        final long currentTime = new Date().getTime();
+        if(time > currentTime) {
+            final long days = TimeUnit.DAYS.convert(time - currentTime, TimeUnit.MILLISECONDS);
+            final long hours = TimeUnit.HOURS.convert((time - currentTime)%86400000, TimeUnit.MILLISECONDS);
+            final long minutes = (time-currentTime)/(60 * 1000) % 60;
+            lore.add(ChatColor.GRAY + "Expires: " + ChatColor. + days+"D " + hours+"H "+minutes+"M");//ItemData.formatTime(time));
+        }else lore.add(ChatColor.GRAY+"Expires: " + ChatColor.DARK_RED+"EXPIRED");
 
         OfflinePlayer seller = Bukkit.getOfflinePlayer(UUID.fromString(NBTData.getNBT(item, NBT.SELLER.toString())));
         lore.add(ChatColor.GRAY+"Seller: "+ChatColor.GOLD+seller.getName());
