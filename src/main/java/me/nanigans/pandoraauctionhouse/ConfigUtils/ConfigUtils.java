@@ -78,7 +78,6 @@ public class ConfigUtils {
         for (File materialFile : materialFiles) {//material folders
             if(materialFile.isDirectory()) {
                 if (Arrays.stream(materialFile.list()).anyMatch(i -> i.contains(info.getPlayer().getUniqueId().toString()))) {
-
                     new BukkitRunnable() {
                         @Override
                         public void run() {
@@ -96,7 +95,6 @@ public class ConfigUtils {
 
                         }
                     }.runTaskAsynchronously(info.getPlugin());
-
                 }else{
                     info.getPlayer().closeInventory();
                     return ChatColor.RED+"You are not selling anything in this category";
@@ -129,6 +127,11 @@ public class ConfigUtils {
                 Map<Enchantment, Integer> enchants = ItemData.parseEnchantNBT(NBTData.getNBT(itemStack, NBTEnums.NBT.ENCHANTS.toString()));
                 itemStack.addEnchantments(enchants);
                 itemStack = NBTData.removeNBT(itemStack, NBTEnums.NBT.ENCHANTS.toString());
+                itemStack = NBTData.removeNBT(itemStack, NBTEnums.NBT.PRICE.toString());
+                itemStack = NBTData.removeNBT(itemStack, NBTEnums.NBT.DATEEXPIRE.toString());
+                itemStack = NBTData.removeNBT(itemStack, NBTEnums.NBT.DATESOLD.toString());
+                itemStack = NBTData.removeNBT(itemStack, NBTEnums.NBT.SELLER.toString());
+
             }
             if (category != AuctionCategories.ALL && !player.getInventory().addItem(itemStack).isEmpty())
                 player.getWorld().dropItem(player.getLocation(), itemStack);
@@ -165,12 +168,12 @@ public class ConfigUtils {
         try {
             createAHConfigFolder(plugin.path + "/Categories/" + category.toString() + "/" + item.getType());
         }catch(IOException ignored){}
+
             YamlGenerator yaml = new YamlGenerator(plugin.path+"/Categories/"+category.toString()+"/"+item.getType()+"/"+player.getUniqueId()+".yml");
             final FileConfiguration data = yaml.getData();
-
             List<ItemStack> soldItems = data.get("selling") == null ? new ArrayList<>() : (List<ItemStack>) data.getList("selling");
             soldItems.add(item);
-            data.set("selling", soldItems);
+        data.set("selling", soldItems);
             if(category != AuctionCategories.ALL){
                 addItemToPlayer(AuctionCategories.ALL, player, item);
             }

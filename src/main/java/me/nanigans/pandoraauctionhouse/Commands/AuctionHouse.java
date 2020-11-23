@@ -4,6 +4,7 @@ import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import me.nanigans.pandoraauctionhouse.Classifications.ItemType;
 import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums;
+import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums.NBT;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.ItemUtils.ItemData;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
@@ -14,7 +15,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
+import java.util.Date;
 import java.util.Map;
 
 public class AuctionHouse implements CommandExecutor {
@@ -36,27 +37,39 @@ public class AuctionHouse implements CommandExecutor {
                             double price = Double.parseDouble(args[1]);
                             if(price >= 0) {
                                 if (item.getEnchantments().size() > 0) {
-                                    item = NBTData.setNBT(item, NBTEnums.NBT.ENCHANTS + "~" + ItemData.serializeEnchantment(item),
-                                            NBTEnums.NBT.PRICE + "~" + args[1]);
 
-                                    for (Map.Entry<Enchantment, Integer> enchantmentIntegerEntry : item.getEnchantments().entrySet()) {
-                                        item.removeEnchantment(enchantmentIntegerEntry.getKey());
-                                    }
+//                                    try{
+//                                        final String s = item.toString();
+//                                    }catch(Exception ignored){
+//                                        item = NBTData.setNBT(item, NBT.ENCHANTS+"~"+ItemData.serializeEnchantment(item));
+//                                        for (Map.Entry<Enchantment, Integer> enchantmentIntegerEntry : item.getEnchantments().entrySet()) {
+//                                            item.removeEnchantment(enchantmentIntegerEntry.getKey());
+//                                        }
+//                                    }
                                 }
+
+                                item = NBTData.setNBT(item,
+                                        NBT.PRICE + "~" + args[1],
+                                        NBT.DATEEXPIRE+"~"+(new Date().getTime()+604800000),//one week TODO: change this to cusomizable
+                                        NBT.SELLER+"~"+player.getUniqueId(),
+                                        NBT.DATESOLD+"~"+new Date().getTime()
+                                );
+
                                 AuctionCategories category = ItemType.getItemCategory(item);
 
                                 ConfigUtils.addItemToPlayer(category, player, item);
-
                                 player.sendMessage(ChatColor.GOLD + "You have listed " + ChatColor.WHITE
                                         + item.getAmount() + "x" + item.getType() + " for $" + ChatColor.GREEN + price);
 
                             }else{
                                 player.sendMessage(ChatColor.RED+"Please enter a valid price above 0");
-                                return true;
                             }
+                            return true;
                         }catch(NumberFormatException e){
                             player.sendMessage(ChatColor.RED+"Please enter a valid price above 0");
                             return true;
+                        }catch(Exception e){
+                            e.printStackTrace();
                         }
                     }else{
                         player.sendMessage(ChatColor.RED+"You are not holding an item in your hand");

@@ -4,6 +4,10 @@ import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 public class NBTData {
 
     public static boolean containsNBT(ItemStack item, String key){
@@ -63,15 +67,44 @@ public class NBTData {
         NBTTagCompound tag = stack.getTag() != null ? stack.getTag() : new NBTTagCompound();
 
         for (String s : keyValuePair) {
-
             String[] nbt = s.split("~");
             tag.setString(nbt[0], nbt[1]);
         }
+        System.out.println("tag = " + tag);
         stack.setTag((tag));
 
         item = CraftItemStack.asCraftMirror(stack);
 
         return item;
+
+    }
+
+
+    public static Map<String, String> getAllNBT(ItemStack item){
+
+        net.minecraft.server.v1_8_R3.ItemStack stack = CraftItemStack.asNMSCopy(item);
+        NBTTagCompound tag = stack.getTag();
+
+        if(tag != null){
+
+            final Set<String> nbtKeys = tag.c();
+
+            System.out.println("nbtKeys = " + nbtKeys);
+            Map<String, String> nbtMap = new HashMap<>();
+
+            for (String nbtKey : nbtKeys) {
+
+                String data = getNBT(item, nbtKey);
+
+                if(data != null)
+                    nbtMap.put(nbtKey, data);
+
+            }
+
+            return nbtMap;
+
+        }
+        return null;
 
     }
 }

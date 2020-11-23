@@ -4,6 +4,7 @@ import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums;
 import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
+import me.nanigans.pandoraauctionhouse.Commands.AuctionHouse;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
 import me.nanigans.pandoraauctionhouse.Title;
@@ -11,6 +12,7 @@ import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -24,6 +26,14 @@ import static me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation.itemPla
 
 public class InventoryActions {
 
+
+    public static void openMaterial(AuctionHouseInventory info){
+
+        info.setViewingMaterial(info.getLastClicked().getType());
+        Inventory inv = InventoryCreation.createListingInventory(info);
+        info.swapInvs(inv);
+
+    }
 
     /**
      * Shows all of the listings by the player

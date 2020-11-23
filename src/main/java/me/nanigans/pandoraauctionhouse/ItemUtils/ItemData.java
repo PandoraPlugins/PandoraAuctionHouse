@@ -3,6 +3,9 @@ package me.nanigans.pandoraauctionhouse.ItemUtils;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -10,6 +13,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ItemData {
+
+    public static String formatTime(long time){
+
+        DateFormat formatter = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+        return formatter.format(new Date(time));
+    }
 
     /**
      * Serealizes any enchantments including the Glow effect

@@ -3,22 +3,110 @@ package me.nanigans.pandoraauctionhouse.InvUtils;
 import com.earth2me.essentials.Essentials;
 import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
+import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums;
 import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums.NBT;
 import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
+import me.nanigans.pandoraauctionhouse.Commands.AuctionHouse;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
+import me.nanigans.pandoraauctionhouse.ConfigUtils.YamlGenerator;
+import me.nanigans.pandoraauctionhouse.ItemUtils.ItemData;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.io.File;
 import java.util.*;
 
 public class InventoryCreation {
 
+    /*************************************
+     *
+     *    PLAYER LISTING INVENTORY
+     *
+     ************************************/
+
+    public static final short invListingSize = 45;
+
+    public static Inventory createListingInventory(AuctionHouseInventory info){
+
+        try {
+            Inventory inv = Bukkit.createInventory(info.getPlayer(), invListingSize + 9, "Player Listings");
+
+            inv.setItem(inv.getSize() - 8, createItem(Material.BARRIER, ChatColor.RED + "Back", "BACK~back"));
+            inv.setItem(inv.getSize() - 7, createItem(Material.BARRIER, "Balance: $" + Essentials.getPlugin(Essentials.class).getUser(info.getPlayer()).getMoney()));
+            //inv.setItem(inv);
+
+            File matFile = new File(info.getPlugin().path + "Categories/" + info.getCategory() + "/" + info.getViewingMaterial());
+            if (matFile.exists()) {
+
+                final File[] files = matFile.listFiles();
+                for (File file : files) {
+                    if(file.getAbsolutePath().endsWith(".yml")) {
+
+                        YamlGenerator yaml = new YamlGenerator(file.getAbsolutePath());
+                        final FileConfiguration data = yaml.getData();
+                        final List<ItemStack> selling = (List<ItemStack>) data.getList("selling");
+                        short invPlace = 0;
+
+                        for (ItemStack itemStack : selling) {
+                            if (invPlace < invListingSize) {
+                                String enchantData = NBTData.getNBT(itemStack, NBT.ENCHANTS.toString());
+                                if (enchantData != null) {
+                                    Map<Enchantment, Integer> enchants = ItemData.parseEnchantNBT(enchantData);
+                                    itemStack.addEnchantments(enchants);
+                                }
+                                createItemInformation(itemStack);
+
+                                inv.setItem(invPlace, itemStack);
+                                invPlace++;
+                            } else break;
+
+                        }
+
+                    }
+                }
+                return inv;
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static ItemStack createItemInformation(ItemStack item){
+
+        ItemMeta meta = item.getItemMeta();
+        List<String> lore = meta.getLore() == null ? new ArrayList<>() : meta.getLore();
+        lore.add(ChatColor.GRAY+"Price: "+ChatColor.GOLD+"$"+NBTData.getNBT(item, NBT.PRICE.toString()));
+        System.out.println("NBTData.getNBT(item, NBT.DATEEXPIRE.toString()) = " + NBTData.getNBT(item, NBT.DATEEXPIRE.toString()));
+        final long time = Long.parseLong(NBTData.getNBT(item, NBT.DATEEXPIRE.toString()));
+
+        if(time > new Date().getTime())
+        lore.add(ChatColor.GRAY+"Expires: " +ChatColor.BLUE+ ItemData.formatTime(time));
+        else lore.add(ChatColor.GRAY+"Expires: " + ChatColor.DARK_RED+"EXPIRED");
+
+        OfflinePlayer seller = Bukkit.getOfflinePlayer(UUID.fromString(NBTData.getNBT(item, NBT.SELLER.toString())));
+        lore.add(ChatColor.GRAY+"Seller: "+ChatColor.GOLD+seller.getName());
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+        return item;
+
+    }
+
+    /*******************************************************
+     *
+     *     MAIN AUCTION HOUSE INVENTORY
+     *
+     ******************************************************/
     public static final LinkedHashMap<AuctionCategories, ItemStack> itemCategories = new LinkedHashMap<AuctionCategories, ItemStack>(){{
         ItemStack item = createItem(Material.NETHER_STAR, "All", "METHOD~categoryChange", "SETCATEGORY~"+AuctionCategories.ALL);
         ItemMeta meta = item.getItemMeta();

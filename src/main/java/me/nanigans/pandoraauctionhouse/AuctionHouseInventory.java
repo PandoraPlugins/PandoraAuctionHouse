@@ -5,16 +5,16 @@ import me.nanigans.pandoraauctionhouse.Classifications.InventoryType;
 import me.nanigans.pandoraauctionhouse.Classifications.ItemType;
 import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
-import me.nanigans.pandoraauctionhouse.InvUtils.InventoryActionUtils;
 import me.nanigans.pandoraauctionhouse.InvUtils.InventoryActions;
 import me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -37,6 +37,7 @@ public class AuctionHouseInventory implements Listener {
     private Sorted sorted = Sorted.A_Z;
     private volatile String message;
     private boolean isTyping;
+    private Material viewingMaterial;
 
     public AuctionHouseInventory(Player player){
 
@@ -133,12 +134,24 @@ public class AuctionHouseInventory implements Listener {
     }
 
     public void swapInvs(Inventory newInv){
+        if(newInv == null) {
+            this.player.closeInventory();
+            this.player.sendMessage(ChatColor.RED+"Something went wrong when swapping inventories");
+        }else {
+            this.inventory = newInv;
+            this.swappingInvs = true;
+            this.player.openInventory(newInv);
+            this.swappingInvs = false;
+        }
 
-        this.inventory = newInv;
-        this.swappingInvs = true;
-        this.player.openInventory(newInv);
-        this.swappingInvs = false;
+    }
 
+    public Material getViewingMaterial() {
+        return viewingMaterial;
+    }
+
+    public void setViewingMaterial(Material viewingMaterial) {
+        this.viewingMaterial = viewingMaterial;
     }
 
     public String getMessage() {
