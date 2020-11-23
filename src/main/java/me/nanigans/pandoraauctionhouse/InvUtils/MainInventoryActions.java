@@ -4,7 +4,6 @@ import com.earth2me.essentials.Essentials;
 import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import me.nanigans.pandoraauctionhouse.Classifications.InventoryType;
-import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums;
 import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums.NBT;
 import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
@@ -22,16 +21,19 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation.createItem;
-import static me.nanigans.pandoraauctionhouse.InvUtils.ListingInventoryActions.createListingInventory;
+
+@FunctionalInterface
+interface Method {
+    void execute();
+}
 
 public class MainInventoryActions extends InventoryActions{
 
-    private static final LinkedHashMap<AuctionCategories, ItemStack> itemCategories = new LinkedHashMap<AuctionCategories, ItemStack>(){{
+    public static final LinkedHashMap<AuctionCategories, ItemStack> itemCategories = new LinkedHashMap<AuctionCategories, ItemStack>(){{
         ItemStack item = createItem(Material.NETHER_STAR, "All", "METHOD~categoryChange", "SETCATEGORY~"+AuctionCategories.ALL);
         ItemMeta meta = item.getItemMeta();
         meta.setLore(Arrays.asList("Press Q on any category", "to remove all your listings", "under it"));
@@ -55,21 +57,21 @@ public class MainInventoryActions extends InventoryActions{
 
     public MainInventoryActions(AuctionHouseInventory info) {
         super(info);
+        methods.put("openMaterial", this::openMaterial);
+        methods.put("categoryChange", this::categoryChange);
+        methods.put("categoryDown", this::categoryDown);
+        methods.put("categoryUp", this::categoryUp);
     }
 
     @Override
-    public void click(String method) throws NoSuchMethodException {
-        try {
-            this.getClass().getMethod(method).invoke(this);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+    public void click(String method) {
+        methods.get(method).execute();
     }
 
 
-    public void openMaterial(){
+    private void openMaterial(){
         info.setViewingMaterial(info.getLastClicked().getType());
-        Inventory inv = createListingInventory(info);
+        Inventory inv = info.getListingInventory().createInventory();
         info.swapInvs(inv);
         info.setInvType(InventoryType.LISTINGS);
     }
@@ -77,7 +79,7 @@ public class MainInventoryActions extends InventoryActions{
     /**
      * Changes the category topic to the item clicked
      */
-    public void categoryChange(){
+    private void categoryChange(){
         InventoryActionUtils.clearItemBoard(info);
         ItemStack item = info.getLastClicked();
         if(item != null){
@@ -92,7 +94,7 @@ public class MainInventoryActions extends InventoryActions{
     /**
      * Moves the category list down
      */
-    public void categoryDown(){
+    private void categoryDown(){
         info.setCategoryFirst((byte) (info.getCategoryFirst()+1));
         PrimitiveIterator.OfInt iterator = Arrays.stream(categoryPlaces).iterator();
         final Object[] objects = itemCategories.values().toArray();
@@ -105,7 +107,7 @@ public class MainInventoryActions extends InventoryActions{
     /**
      * Moves the category list up
      */
-    public void categoryUp(){
+    private void categoryUp(){
 
         info.setCategoryFirst((byte) (info.getCategoryFirst()-1));
 
@@ -121,7 +123,7 @@ public class MainInventoryActions extends InventoryActions{
      * Shows all of the listings by the player
      */
     @Override
-    public void getPlayerListings() {
+    protected void getPlayerListings() {
 
         File file = new File(info.getPlugin().path+"/Categories/"+info.getCategory());
         List<Material> playerLists = new ArrayList<>();
@@ -154,7 +156,7 @@ public class MainInventoryActions extends InventoryActions{
      * Moves the page forward by one in the main AH inventory
      */
     @Override
-    public void pageForward() {
+    protected void pageForward() {
 
         List<String> materialList = InventoryActionUtils.sortByAlphabetical(
                 ConfigUtils.getMaterialsFromCategory(info.getCategory()), info.getSorted() == Sorted.Z_A);//item listings by material
@@ -175,7 +177,7 @@ public class MainInventoryActions extends InventoryActions{
      * Moves the page backwards one in the main AH inventory
      */
     @Override
-    public void pageBackwards() {
+    protected void pageBackwards() {
 
         List<String> materialList = InventoryActionUtils.sortByAlphabetical(
                 ConfigUtils.getMaterialsFromCategory(info.getCategory()), info.getSorted() == Sorted.Z_A);//item listings by material
@@ -194,7 +196,7 @@ public class MainInventoryActions extends InventoryActions{
      * Changes the sort method between A-Z and Z-A
      */
     @Override
-    public void sortBy() {
+    protected void sortBy() {
 
         if(info.getSorted() == Sorted.A_Z) {
             info.setSorted(Sorted.Z_A);
@@ -214,7 +216,7 @@ public class MainInventoryActions extends InventoryActions{
      * Allows the player to seach for an item by its name
      */
     @Override
-    public void searchBy() {
+    protected void searchBy() {
 
         info.setSwappingInvs(true);
         info.getPlayer().closeInventory();

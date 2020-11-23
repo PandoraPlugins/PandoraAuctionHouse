@@ -2,10 +2,11 @@ package me.nanigans.pandoraauctionhouse.InvUtils;
 
 import com.earth2me.essentials.Essentials;
 import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
+import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums.NBT;
+import me.nanigans.pandoraauctionhouse.Commands.AuctionHouse;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.YamlGenerator;
 import me.nanigans.pandoraauctionhouse.ItemUtils.ItemData;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
-import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums.NBT;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -25,42 +25,39 @@ import static me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation.createI
 
 public class ListingInventoryActions extends InventoryActions{
 
-
     public ListingInventoryActions(AuctionHouseInventory info) {
         super(info);
     }
 
     @Override
-    public void click(String method) throws NoSuchMethodException {
-        try {
-            this.getClass().getMethod(method).invoke(this);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void getPlayerListings() {
+    public void click(String method) {
 
     }
 
+
     @Override
-    public void pageForward() {
+    protected void getPlayerListings() {
 
     }
 
     @Override
-    public void pageBackwards() {
+    protected void pageForward() {
+
+    }
+
+
+    @Override
+    protected void pageBackwards() {
 
     }
 
     @Override
-    public void sortBy() {
+    protected void sortBy() {
 
     }
 
     @Override
-    public void searchBy() {
+    protected void searchBy() {
 
     }
 

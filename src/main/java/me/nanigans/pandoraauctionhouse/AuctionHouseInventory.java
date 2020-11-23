@@ -7,7 +7,6 @@ import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.InvUtils.ListingInventoryActions;
 import me.nanigans.pandoraauctionhouse.InvUtils.MainInventoryActions;
-import me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -21,8 +20,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import java.lang.reflect.InvocationTargetException;
 
 public class AuctionHouseInventory implements Listener {
 
@@ -47,7 +44,7 @@ public class AuctionHouseInventory implements Listener {
         this.player = player;
         this.plugin = PandoraAuctionHouse.getPlugin(PandoraAuctionHouse.class);
         this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
-        Inventory inventory = InventoryCreation.createAuctionHousePage(this);
+        Inventory inventory = this.mainInventory.createInventory();
         player.openInventory(inventory);
         this.inventory = inventory;
 
@@ -152,6 +149,14 @@ public class AuctionHouseInventory implements Listener {
 
     }
 
+    public MainInventoryActions getMainInventory() {
+        return mainInventory;
+    }
+
+    public ListingInventoryActions getListingInventory() {
+        return listingInventory;
+    }
+
     public Material getViewingMaterial() {
         return viewingMaterial;
     }
@@ -209,7 +214,7 @@ public class AuctionHouseInventory implements Listener {
     }
 
     public void setCategoryFirst(byte categoryFirst) {
-        this.categoryFirst = (byte) Math.max(Math.min(InventoryCreation.itemCategories.size()-4, categoryFirst), 0);
+        this.categoryFirst = (byte) Math.max(Math.min(MainInventoryActions.itemCategories.size()-4, categoryFirst), 0);
     }
 
     public AuctionCategories getCategory() {

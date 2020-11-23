@@ -5,7 +5,6 @@ import net.minecraft.server.v1_8_R3.CreativeModeTab;
 import net.minecraft.server.v1_8_R3.Item;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import org.bukkit.inventory.ItemStack;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

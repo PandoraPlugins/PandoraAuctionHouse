@@ -1,36 +1,11 @@
 package me.nanigans.pandoraauctionhouse.InvUtils;
 
-import com.earth2me.essentials.Essentials;
-import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
-import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
-import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums;
-import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums.NBT;
-import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
-import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
-import me.nanigans.pandoraauctionhouse.ConfigUtils.YamlGenerator;
-import me.nanigans.pandoraauctionhouse.ItemUtils.ItemData;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
-
-import java.io.File;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class InventoryCreation {
-    /*******************************************************
-     *
-     *     MAIN AUCTION HOUSE INVENTORY
-     *
-     ******************************************************/
 
     /**
      * Creates a new item from a string material id

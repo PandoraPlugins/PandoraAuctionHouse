@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation.createItem;
-import static me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation.itemPlaces;
+import static me.nanigans.pandoraauctionhouse.InvUtils.MainInventoryActions.itemPlaces;
 
 public class InventoryActionUtils {
 

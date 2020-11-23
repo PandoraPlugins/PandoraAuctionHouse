@@ -1,8 +1,8 @@
 package me.nanigans.pandoraauctionhouse;
 
+import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import me.nanigans.pandoraauctionhouse.Commands.AuctionHouse;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
-import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
