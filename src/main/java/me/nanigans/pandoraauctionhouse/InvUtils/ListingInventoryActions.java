@@ -4,6 +4,7 @@ import com.avaje.ebean.validation.NotNull;
 import com.earth2me.essentials.Essentials;
 import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
 import me.nanigans.pandoraauctionhouse.Classifications.InventoryType;
+import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums;
 import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums.NBT;
 import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.YamlGenerator;
@@ -24,6 +25,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation.createItem;
 
@@ -47,6 +49,17 @@ public class ListingInventoryActions extends InventoryActions{
 
     protected void confirmPurchase(){
 
+        info.getConfirmInventory().setItem(info.getLastClicked());
+        info.getConfirmInventory().setItemWithData(info.getLastClicked());
+        info.setInvType(InventoryType.CONFIRM);
+        Inventory inv = info.getConfirmInventory().createInventory();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                info.swapInvs(inv);
+
+            }
+        }.runTask(info.getPlugin());
 
     }
 
@@ -86,7 +99,7 @@ public class ListingInventoryActions extends InventoryActions{
         List<ItemStack> listings = getAllListings();
         info.setPage((int) Math.min(Math.floor((double)listings.size()/invSize), info.getPage()+1));
         clearItems(invSize);
-        displayItems(listings, "METHOD~confirmPurchase");
+        displayItems(listings, NBTEnums.NBT.METHOD+"~confirmPurchase");
 
     }
 
@@ -95,7 +108,7 @@ public class ListingInventoryActions extends InventoryActions{
         List<ItemStack> listings = getAllListings();
         info.setPage(info.getPage()-1);
         clearItems(invSize);
-        displayItems(listings, "METHOD~confirmPurchase");
+        displayItems(listings, NBTEnums.NBT.METHOD+"~confirmPurchase");
     }
 
     @Override
@@ -103,7 +116,7 @@ public class ListingInventoryActions extends InventoryActions{
 
         Sorted type = goThroughSorting();
         info.setSorted(type);
-        displayItems(getAllListings(), "METHOD~confirmPurchase");
+        displayItems(getAllListings(), NBTEnums.NBT.METHOD+"~confirmPurchase");
 
     }
 
@@ -130,7 +143,7 @@ public class ListingInventoryActions extends InventoryActions{
                                 final FileConfiguration data = yaml.getData();
                                 final List<ItemStack> selling = (List<ItemStack>) data.getList("selling");
                                 clearItems(invSize);
-                                displayItems(selling, "METHOD~confirmPurchase");
+                                displayItems(selling, NBTEnums.NBT.METHOD+"~confirmPurchase");
                                 info.swapInvs(info.getInventory());
                             }else{
                                 info.getPlayer().sendMessage(ChatColor.RED+"Couldn't find that player");
@@ -183,7 +196,7 @@ public class ListingInventoryActions extends InventoryActions{
                 sortedIndex = (byte) (sortTypes.length-1);
             else sortedIndex = (byte) Math.max(0, sortedIndex-1);
 
-        ItemStack sortBy = createItem(Material.DIAMOND, "Sort By:", "METHOD~sortBy");
+        ItemStack sortBy = createItem(Material.DIAMOND, "Sort By:", NBTEnums.NBT.METHOD+"~sortBy");
         ItemMeta sMeta = sortBy.getItemMeta();
         List<String> lore = Arrays.asList(ChatColor.GRAY+"Newest", ChatColor.GRAY+"Oldest", ChatColor.GRAY+"A-Z",
                 ChatColor.GRAY+"Z-A", ChatColor.GRAY+"Cheapest", ChatColor.GRAY+"Expensive");
@@ -206,11 +219,13 @@ public class ListingInventoryActions extends InventoryActions{
 
             File[] files = file.listFiles();
             for (File file1 : files) {
-                YamlGenerator yaml = new YamlGenerator(file1.getPath());
-                final FileConfiguration data = yaml.getData();
-                final List<ItemStack> selling = (List<ItemStack>) data.getList("selling");
-                if(selling != null && selling.size() > 0)
-                    items.addAll(selling);
+                if(file1.getAbsolutePath().endsWith(".yml")) {
+                    YamlGenerator yaml = new YamlGenerator(file1.getPath());
+                    final FileConfiguration data = yaml.getData();
+                    final List<ItemStack> selling = (List<ItemStack>) data.getList("selling");
+                    if (selling != null && selling.size() > 0)
+                        items.addAll(selling);
+                }
             }
 
         }
@@ -255,31 +270,31 @@ public class ListingInventoryActions extends InventoryActions{
             Inventory inv = Bukkit.createInventory(info.getPlayer(), invSize + 9, "Player Listings");
             info.setInventory(inv);
 
-            inv.setItem(inv.getSize() - 9, createItem(Material.BARRIER, ChatColor.RED + "Back", "METHOD~back"));
+            inv.setItem(inv.getSize() - 9, createItem(Material.BARRIER, ChatColor.RED + "Back", NBTEnums.NBT.METHOD+"~back"));
             inv.setItem(inv.getSize() - 8, createItem(Material.PAPER, "Balance: "+ChatColor.GOLD+"$" + Essentials.getPlugin(Essentials.class).getUser(info.getPlayer()).getMoney()));
             ItemStack item = ItemData.createPlaySkull(info.getPlayer());
             SkullMeta meta = (SkullMeta) item.getItemMeta();
             meta.setDisplayName("Your Listings");
             item.setItemMeta(meta);
 
-            inv.setItem(inv.getSize()-6, createItem(Material.COMPASS, "Page Backwards", "METHOD~pageBackwards"));
-            inv.setItem(inv.getSize()-5, NBTData.setNBT(item, "METHOD~getPlayerListings"));
-            inv.setItem(inv.getSize()-4, createItem(Material.COMPASS, "Page Forward", "METHOD~pageForward"));
+            inv.setItem(inv.getSize()-6, createItem(Material.COMPASS, "Page Backwards", NBTEnums.NBT.METHOD+"~pageBackwards"));
+            inv.setItem(inv.getSize()-5, NBTData.setNBT(item, NBTEnums.NBT.METHOD+"~getPlayerListings"));
+            inv.setItem(inv.getSize()-4, createItem(Material.COMPASS, "Page Forward", NBTEnums.NBT.METHOD+"~pageForward"));
 
-            ItemStack sortBy = createItem(Material.DIAMOND, "Sort By:", "METHOD~sortBy");
+            ItemStack sortBy = createItem(Material.DIAMOND, "Sort By:", NBTEnums.NBT.METHOD+"~sortBy");
             ItemMeta sMeta = sortBy.getItemMeta();
             sMeta.setLore(Arrays.asList(ChatColor.GOLD+"Newest", ChatColor.GRAY+"Oldest", ChatColor.GRAY+"A-Z",
                     ChatColor.GRAY+"Z-A", ChatColor.GRAY+"Cheapest", ChatColor.GRAY+"Expensive"));
             sortBy.setItemMeta(sMeta);
 
             inv.setItem(inv.getSize()-2, sortBy);
-            inv.setItem(inv.getSize()-1, createItem(Material.NAME_TAG, "Search By Player Name", "METHOD~searchBy"));
+            inv.setItem(inv.getSize()-1, createItem(Material.NAME_TAG, "Search By Player Name", NBTEnums.NBT.METHOD+"~searchBy"));
 
             File matFile = new File(info.getPlugin().path + "Categories/" + info.getCategory() + "/" + info.getViewingMaterial());
             if (matFile.exists()) {
 
                 final List<ItemStack> allListings = getAllListings();
-                displayItems(allListings, "METHOD~confirmPurchase");
+                displayItems(allListings, NBTEnums.NBT.METHOD+"~confirmPurchase");
                 return inv;
             }
         }catch(Exception e){
@@ -343,6 +358,21 @@ public class ListingInventoryActions extends InventoryActions{
         meta.setLore(lore);
         item.setItemMeta(meta);
 
+    }
+
+    public static ItemStack removeItemInformation(ItemStack item){
+
+        ItemMeta meta = item.getItemMeta();
+        List<String> lore = meta.getLore();
+        if(lore != null){
+
+            lore = lore.stream().filter(i -> !i.contains(ChatColor.GRAY+"Price: ") && !i.contains(ChatColor.GRAY+"Expires: ") &&
+                    !i.contains(ChatColor.GRAY+"Seller: ") && !i.contains("Press Q to delete this listing")).collect(Collectors.toList());
+            meta.setLore(lore);
+            item.setItemMeta(meta);
+
+        }
+        return item;
     }
 
 }

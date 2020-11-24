@@ -30,7 +30,7 @@ public class InventoryActionUtils {
         Iterator<Integer> iterator = Arrays.stream(itemPlaces).iterator();
         for(int i = info.getPage()*materialList.size(); i < materialList.size()*(info.getPage()+1); i++){
             if(materialList.size() > i && iterator.hasNext())
-                info.getInventory().setItem(iterator.next(), createItem(Material.valueOf(materialList.get(i)), null, "METHOD~openMaterial"));
+                info.getInventory().setItem(iterator.next(), createItem(Material.valueOf(materialList.get(i)), null, NBTEnums.NBT.METHOD+"~openMaterial"));
             else break;
         }
 
@@ -102,7 +102,7 @@ public class InventoryActionUtils {
         Iterator<Integer> iterator = Arrays.stream(itemPlaces).iterator();
         for(int i = info.getPage()*list.size(); i < list.size()*(info.getPage()+1); i++){
             if(list.size() > i && iterator.hasNext())
-                info.getInventory().setItem(iterator.next(), createItem(Material.valueOf(list.get(i).getString()), null, "METHOD~openMaterial"));
+                info.getInventory().setItem(iterator.next(), createItem(Material.valueOf(list.get(i).getString()), null, NBTEnums.NBT.METHOD+"~openMaterial"));
             else break;
         }
 
@@ -110,6 +110,20 @@ public class InventoryActionUtils {
 
     }
 
+
+    public static ItemStack removeNBTFromItem(ItemStack item){
+        for(NBTEnums.NBT nbt : NBTEnums.NBT.values()){
+            if(NBTData.containsNBT(item, nbt.toString())){
+                item = NBTData.removeNBT(item, nbt.toString());
+            }
+        }
+        for(Sorted nbt : Sorted.values()){
+            if(NBTData.containsNBT(item, nbt.toString())){
+                item = NBTData.removeNBT(item, nbt.toString());
+            }
+        }
+        return item;
+    }
     /**
      * This will clera the item board with yellow glass
      * @param info

@@ -9,9 +9,7 @@ public class NBTEnums {
         DATEEXPIRE,
         SELLER,
         DATESOLD,
-        NEWEST,
-        OLDEST,
-
+        METHOD
     }
 
 }

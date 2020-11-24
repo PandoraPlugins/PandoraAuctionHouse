@@ -1,10 +1,8 @@
 package me.nanigans.pandoraauctionhouse;
 
-import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
-import me.nanigans.pandoraauctionhouse.Classifications.InventoryType;
-import me.nanigans.pandoraauctionhouse.Classifications.ItemType;
-import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
+import me.nanigans.pandoraauctionhouse.Classifications.*;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
+import me.nanigans.pandoraauctionhouse.InvUtils.ConfirmInventoryActions;
 import me.nanigans.pandoraauctionhouse.InvUtils.ListingInventoryActions;
 import me.nanigans.pandoraauctionhouse.InvUtils.MainInventoryActions;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
@@ -39,6 +37,7 @@ public class AuctionHouseInventory implements Listener {
     private Material viewingMaterial;
     private final MainInventoryActions mainInventory = new MainInventoryActions(this);
     private final ListingInventoryActions listingInventory = new ListingInventoryActions(this);
+    private final ConfirmInventoryActions confirmInventory = new ConfirmInventoryActions(this);
     private ClickType clickType;
 
     public AuctionHouseInventory(Player player){
@@ -66,14 +65,16 @@ public class AuctionHouseInventory implements Listener {
             if(event.getAction().toString().contains("PICKUP")) {
                 ((Player) event.getWhoClicked()).playSound(this.player.getLocation(), Sound.valueOf("CLICK"), 2, 1);
                 if (currentItem != null) {
-                    if (NBTData.containsNBT(currentItem, "METHOD")) {
-                        String method = NBTData.getNBT(currentItem, "METHOD");
+                    if (NBTData.containsNBT(currentItem, NBTEnums.NBT.METHOD.toString())) {
+                        String method = NBTData.getNBT(currentItem, NBTEnums.NBT.METHOD.toString());
                         this.lastClicked = currentItem;
 
                         if(this.invType == InventoryType.MAIN)
                             this.mainInventory.click(method);
                         else if(this.invType == InventoryType.LISTINGS)
                             this.listingInventory.click(method);
+                        else if(this.invType == InventoryType.CONFIRM)
+                            this.confirmInventory.click(method);
 
                     }
                 }
@@ -90,8 +91,8 @@ public class AuctionHouseInventory implements Listener {
                             String msg = ConfigUtils.removePlayerListing(this, category);
                             if(msg != null) this.player.sendMessage(msg);
                         }
-                    }else if(NBTData.containsNBT(currentItem, "METHOD")){
-                        String data = NBTData.getNBT(currentItem, "METHOD");
+                    }else if(NBTData.containsNBT(currentItem, NBTEnums.NBT.METHOD.toString())){
+                        String data = NBTData.getNBT(currentItem, NBTEnums.NBT.METHOD.toString());
                         if(data.equals("openMaterial")){
                             if(this.getCategory() != AuctionCategories.ALL) {
                                 ConfigUtils.removePlayerListing(this, this.getCategory(), currentItem.getType());
@@ -151,6 +152,10 @@ public class AuctionHouseInventory implements Listener {
 
     public ClickType getClickType() {
         return clickType;
+    }
+
+    public ConfirmInventoryActions getConfirmInventory() {
+        return confirmInventory;
     }
 
     public MainInventoryActions getMainInventory() {

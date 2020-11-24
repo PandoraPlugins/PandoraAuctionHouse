@@ -8,16 +8,3 @@ public enum Sorted{
     CHEAPEST,
     EXPENSIVE
 }
-/*
-
- Sort by:
- Newest,
- Oldest
-
- */
-
-/*
-Categorize By:
-A-Z,
-Z-A
- */

@@ -3,6 +3,7 @@ package me.nanigans.pandoraauctionhouse.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
 import me.nanigans.pandoraauctionhouse.Classifications.AuctionCategories;
 import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums;
+import me.nanigans.pandoraauctionhouse.InvUtils.InventoryActionUtils;
 import me.nanigans.pandoraauctionhouse.ItemUtils.ItemData;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
 import me.nanigans.pandoraauctionhouse.PandoraAuctionHouse;
@@ -20,10 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConfigUtils {
@@ -179,6 +177,35 @@ public class ConfigUtils {
             }
 
             yaml.save();
+
+    }
+
+    public static void removeItemFromPlayerListing(ItemStack itemStack, UUID uuid, AuctionCategories category, Material material){
+        PandoraAuctionHouse plugin = PandoraAuctionHouse.getPlugin(PandoraAuctionHouse.class);
+
+        YamlGenerator yaml = new YamlGenerator(plugin.path+"Categories/"+category+"/"+material+"/"+uuid+".yml");
+        if(yaml.getData() != null){
+
+            final FileConfiguration data = yaml.getData();
+            final List<ItemStack> selling = (List<ItemStack>) data.getList("selling");
+
+            for(int i = 0; i < selling.size(); i++){
+                if(InventoryActionUtils.removeNBTFromItem(selling.get(i)).equals(itemStack)){
+                    selling.remove(i);
+                }
+            }
+
+            data.set("selling", selling);
+            yaml.save();
+            if(selling.size() < 1){
+                File file = new File(plugin.path+"Categories/"+category+"/"+material+"/"+uuid+".yml");
+                file.delete();
+                if(file.getParentFile().listFiles().length == 0){
+                    file.getParentFile().delete();
+                }
+            }
+
+        }
 
     }
 

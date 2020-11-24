@@ -1,5 +1,7 @@
 package me.nanigans.pandoraauctionhouse.InvUtils;
 
+import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums;
+import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
