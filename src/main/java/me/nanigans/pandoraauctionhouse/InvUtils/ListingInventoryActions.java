@@ -7,6 +7,7 @@ import me.nanigans.pandoraauctionhouse.Classifications.InventoryType;
 import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums;
 import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums.NBT;
 import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
+import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.YamlGenerator;
 import me.nanigans.pandoraauctionhouse.ItemUtils.ItemData;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
@@ -225,9 +226,10 @@ public class ListingInventoryActions extends InventoryActions{
                 if(file1.getAbsolutePath().endsWith(".yml")) {
                     YamlGenerator yaml = new YamlGenerator(file1.getPath());
                     final FileConfiguration data = yaml.getData();
-                    final List<ItemStack> selling = (List<ItemStack>) data.getList("selling");
+                    final Map<String, ItemStack> selling = ConfigUtils.getConfigSectionValue(data.get("selling"), false);
+
                     if (selling != null && selling.size() > 0)
-                        items.addAll(selling);
+                        items.addAll((selling.values()));
                 }
             }
 

@@ -54,17 +54,18 @@ public class AuctionHouse implements CommandExecutor {
                                     player.sendMessage(ChatColor.RED+"This item cannot be sold");
                                     return true;
                                 }
-
+                                UUID uuid = UUID.randomUUID();
                                 item = NBTData.setNBT(item,
                                         NBT.PRICE + "~" + args[1],
                                         NBT.DATEEXPIRE+"~"+(new Date().getTime()+604800000),//one week TODO: change this to cusomizable
                                         NBT.SELLER+"~"+player.getUniqueId(),
-                                        NBT.DATESOLD+"~"+new Date().getTime()
+                                        NBT.DATESOLD+"~"+new Date().getTime(),
+                                        "UUID~"+uuid
                                 );
 
                                 AuctionCategories category = ItemType.getItemCategory(item);
 
-                                ConfigUtils.addItemToPlayer(category, player, item);
+                                ConfigUtils.addItemToPlayer(category, player, item, uuid);
                                 player.sendMessage(ChatColor.GOLD + "You have listed " + ChatColor.WHITE
                                         + item.getAmount() + "x" + item.getType() + " for $" + ChatColor.GREEN + price);
 

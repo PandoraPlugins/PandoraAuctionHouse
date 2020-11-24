@@ -114,25 +114,50 @@ public class ConfigUtils {
      * @param filePath the path of the yml file
      * @param category the category to the yml file
      */
-    public static void giveItemsBackToPlayer(Player player, String filePath, AuctionCategories category){
+    public static void giveItemsBackToPlayer(Player player, String filePath, AuctionCategories category, String... itemUUID){
 
         YamlGenerator yaml = new YamlGenerator(filePath);
         final FileConfiguration data = yaml.getData();
-        final List<ItemStack> selling = (List<ItemStack>) data.getList("selling");
-        for (ItemStack itemStack : selling) {
-            if (NBTData.containsNBT(itemStack, NBTEnums.NBT.ENCHANTS.toString())) {
+        final Map<String, ItemStack> selling = getConfigSectionValue(data.get("selling"), false);
 
-                Map<Enchantment, Integer> enchants = ItemData.parseEnchantNBT(NBTData.getNBT(itemStack, NBTEnums.NBT.ENCHANTS.toString()));
-                itemStack.addEnchantments(enchants);
-                itemStack = NBTData.removeNBT(itemStack, NBTEnums.NBT.ENCHANTS.toString());
-                itemStack = NBTData.removeNBT(itemStack, NBTEnums.NBT.PRICE.toString());
-                itemStack = NBTData.removeNBT(itemStack, NBTEnums.NBT.DATEEXPIRE.toString());
-                itemStack = NBTData.removeNBT(itemStack, NBTEnums.NBT.DATESOLD.toString());
-                itemStack = NBTData.removeNBT(itemStack, NBTEnums.NBT.SELLER.toString());
+        if(itemUUID.length > 0) {
 
+            for (String s : itemUUID) {
+                ItemStack item = selling.get(s).clone();
+                if (NBTData.containsNBT(item, NBTEnums.NBT.ENCHANTS.toString())) {
+
+                    Map<Enchantment, Integer> enchants = ItemData.parseEnchantNBT(NBTData.getNBT(item, NBTEnums.NBT.ENCHANTS.toString()));
+                    item.addEnchantments(enchants);
+
+                }
+                item = InventoryActionUtils.removeNBTFromItem(item);
+                item = NBTData.removeNBT(item, "UUID");
+
+                if (!player.getInventory().addItem(item).isEmpty())
+                    player.getWorld().dropItem(player.getLocation(), item);
+
+                selling.remove(s);
             }
-            if (category != AuctionCategories.ALL && !player.getInventory().addItem(itemStack).isEmpty())
-                player.getWorld().dropItem(player.getLocation(), itemStack);
+
+        }else{
+
+            for (Map.Entry<String, ItemStack> entry : selling.entrySet()) {
+
+                ItemStack item = entry.getValue().clone();
+                if (NBTData.containsNBT(item, NBTEnums.NBT.ENCHANTS.toString())) {
+
+                    Map<Enchantment, Integer> enchants = ItemData.parseEnchantNBT(NBTData.getNBT(item, NBTEnums.NBT.ENCHANTS.toString()));
+                    item.addEnchantments(enchants);
+
+                }
+                item = InventoryActionUtils.removeNBTFromItem(item);
+                item = NBTData.removeNBT(item, "UUID");
+
+                if (category != AuctionCategories.ALL && !player.getInventory().addItem(item).isEmpty())
+                    player.getWorld().dropItem(player.getLocation(), item);
+
+                selling.remove(entry.getKey());
+            }
 
         }
 
@@ -160,7 +185,7 @@ public class ConfigUtils {
      * @param player the player adding the listing
      * @param item the item to add to the listing
      */
-    public static void addItemToPlayer(AuctionCategories category, Player player, ItemStack item){
+    public static void addItemToPlayer(AuctionCategories category, Player player, ItemStack item, UUID uuid){
         PandoraAuctionHouse plugin = PandoraAuctionHouse.getPlugin(PandoraAuctionHouse.class);
 
         try {
@@ -169,44 +194,43 @@ public class ConfigUtils {
 
             YamlGenerator yaml = new YamlGenerator(plugin.path+"/Categories/"+category.toString()+"/"+item.getType()+"/"+player.getUniqueId()+".yml");
             final FileConfiguration data = yaml.getData();
-            List<ItemStack> soldItems = data.get("selling") == null ? new ArrayList<>() : (List<ItemStack>) data.getList("selling");
-            soldItems.add(item);
-        data.set("selling", soldItems);
+            Map<String, ItemStack> soldItems = data.get("selling") == null ? new HashMap<>() : getConfigSectionValue(data.get("selling"), false);
+            soldItems.put(uuid.toString(), item);
+            data.set("selling", soldItems);
             if(category != AuctionCategories.ALL){
-                addItemToPlayer(AuctionCategories.ALL, player, item);
+                addItemToPlayer(AuctionCategories.ALL, player, item, uuid);
             }
 
             yaml.save();
 
     }
 
-    public static void removeItemFromPlayerListing(ItemStack itemStack, UUID uuid, AuctionCategories category, Material material){
+    public static boolean removeItemFromPlayerListing(String itemUUID, String playerUUID, AuctionCategories category, Material material){
         PandoraAuctionHouse plugin = PandoraAuctionHouse.getPlugin(PandoraAuctionHouse.class);
+        File file = new File(plugin.path+"Categories/"+category+"/"+material+"/"+playerUUID+".yml");
 
-        YamlGenerator yaml = new YamlGenerator(plugin.path+"Categories/"+category+"/"+material+"/"+uuid+".yml");
-        if(yaml.getData() != null){
+        if(file.exists()) {
+            YamlGenerator yaml = new YamlGenerator(file.getAbsolutePath());
+            if (yaml.getData() != null) {
 
-            final FileConfiguration data = yaml.getData();
-            final List<ItemStack> selling = (List<ItemStack>) data.getList("selling");
+                final FileConfiguration data = yaml.getData();
+                final Map<String, ItemStack> selling = getConfigSectionValue(data.get("selling"), false);
+                selling.remove(itemUUID);
+                data.set("selling", selling);
+                yaml.save();
 
-            for(int i = 0; i < selling.size(); i++){
-                if(InventoryActionUtils.removeNBTFromItem(selling.get(i)).equals(itemStack)){
-                    selling.remove(i);
+                if (selling.size() < 1) {
+                    file.delete();
+                    if (file.getParentFile().listFiles().length == 0) {
+                        file.getParentFile().delete();
+                    }
                 }
-            }
+                return true;
 
-            data.set("selling", selling);
-            yaml.save();
-            if(selling.size() < 1){
-                File file = new File(plugin.path+"Categories/"+category+"/"+material+"/"+uuid+".yml");
-                file.delete();
-                if(file.getParentFile().listFiles().length == 0){
-                    file.getParentFile().delete();
-                }
-            }
-
+            }else return false;
+        }else{
+            return false;
         }
-
     }
 
     /**
@@ -241,15 +265,15 @@ public class ConfigUtils {
      * @return A {@link Map} representing the section
      */
     @SuppressWarnings("unchecked")
-    public static Map<String, Object> getConfigSectionValue(Object o, boolean deep) {
+    public static <T> Map<String, T> getConfigSectionValue(Object o, boolean deep) {
         if (o == null) {
             return null;
         }
-        Map<String, Object> map;
+        Map<String, T> map;
         if (o instanceof ConfigurationSection) {
-            map = ((ConfigurationSection) o).getValues(deep);
+            map = (Map<String, T>) ((ConfigurationSection) o).getValues(deep);
         } else if (o instanceof Map) {
-            map = (Map<String, Object>) o;
+            map = (Map<String, T>) o;
         } else {
             return null;
         }

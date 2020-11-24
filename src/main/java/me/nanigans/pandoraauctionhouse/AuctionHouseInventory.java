@@ -2,10 +2,7 @@ package me.nanigans.pandoraauctionhouse;
 
 import me.nanigans.pandoraauctionhouse.Classifications.*;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
-import me.nanigans.pandoraauctionhouse.InvUtils.ConfirmInventoryActions;
-import me.nanigans.pandoraauctionhouse.InvUtils.InventoryActionUtils;
-import me.nanigans.pandoraauctionhouse.InvUtils.ListingInventoryActions;
-import me.nanigans.pandoraauctionhouse.InvUtils.MainInventoryActions;
+import me.nanigans.pandoraauctionhouse.InvUtils.*;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -94,6 +91,7 @@ public class AuctionHouseInventory implements Listener {
                             String msg = ConfigUtils.removePlayerListing(this, category);
                             if(msg != null) this.player.sendMessage(msg);
                         }
+
                     }else if(NBTData.containsNBT(currentItem, NBTEnums.NBT.METHOD.toString())){
                         String data = NBTData.getNBT(currentItem, NBTEnums.NBT.METHOD.toString());
                         if(data.equals("openMaterial")){
@@ -104,27 +102,28 @@ public class AuctionHouseInventory implements Listener {
                                 final AuctionCategories itemCategory = ItemType.getItemCategory(currentItem);
                                 ConfigUtils.removePlayerListing(this, this.getCategory(), currentItem.getType());
                                 ConfigUtils.removePlayerListing(this, itemCategory, currentItem.getType());
-
                             }
+                            inventory.setItem(event.getSlot(), InventoryCreation.createItem("160/4", "Empty Slot"));
+                            player.sendMessage(ChatColor.GREEN+"Item removed from listing!");
+
                         }else if(data.equals("confirmPurchase") && ListingInventoryActions.isOwnItem(this.player, currentItem)){
 
-                             UUID uuid = UUID.fromString(NBTData.getNBT(currentItem, NBTEnums.NBT.SELLER.toString()));
-                            currentItem = ListingInventoryActions.removeItemInformation(currentItem);
-                            currentItem = InventoryActionUtils.removeNBTFromItem(currentItem);
-                            System.out.println("currentItem = " + currentItem);
+                             String uuid = NBTData.getNBT(currentItem, NBTEnums.NBT.SELLER.toString());
+                            ConfigUtils.giveItemsBackToPlayer(player, plugin.path+"Categories/"+this.category+"/"+this.viewingMaterial+"/"+player.getUniqueId()+".yml",
+                                    this.category, NBTData.getNBT(currentItem, "UUID"));
+
                             if(this.category != AuctionCategories.ALL) {
-                                ConfigUtils.removeItemFromPlayerListing(currentItem,
-                                        UUID.fromString(NBTData.getNBT(currentItem, NBTEnums.NBT.SELLER.toString())),
+                                ConfigUtils.removeItemFromPlayerListing(NBTData.getNBT(currentItem, "UUID"), uuid,
                                         this.category, currentItem.getType());
                             }else{
                                 final AuctionCategories itemCategory = ItemType.getItemCategory(currentItem);
-                                ConfigUtils.removeItemFromPlayerListing(currentItem, uuid,
+                                ConfigUtils.removeItemFromPlayerListing(NBTData.getNBT(currentItem, "UUID"), uuid,
                                 itemCategory, currentItem.getType());
                             }
-                            ConfigUtils.removeItemFromPlayerListing(currentItem, uuid,
+                            ConfigUtils.removeItemFromPlayerListing(NBTData.getNBT(currentItem, "UUID"), uuid,
                                     AuctionCategories.ALL, currentItem.getType());
-                            if (!this.player.getInventory().addItem(currentItem).isEmpty()) {
-                                this.player.getWorld().dropItem(this.player.getLocation(), currentItem);
+                            inventory.setItem(event.getSlot(), null);
+                            player.sendMessage(ChatColor.GREEN+"Item removed from listing!");
                             }
 
                         }
@@ -135,7 +134,7 @@ public class AuctionHouseInventory implements Listener {
             }
         }
 
-    }
+
 
     @EventHandler
     public void onInvClose(InventoryCloseEvent event) throws Throwable {

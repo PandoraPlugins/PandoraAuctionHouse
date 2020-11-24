@@ -6,7 +6,9 @@ import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
 import me.xdrop.fuzzywuzzy.model.ExtractedResult;
+import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -122,6 +124,14 @@ public class InventoryActionUtils {
                 item = NBTData.removeNBT(item, nbt.toString());
             }
         }
+        net.minecraft.server.v1_8_R3.ItemStack stack = CraftItemStack.asNMSCopy(item);
+        if(stack.hasTag()){
+            final NBTTagCompound tag = stack.getTag();
+            if(tag.c().size() <= 0)
+                stack.setTag(null);
+        }
+        item = CraftItemStack.asCraftMirror(stack);
+
         return item;
     }
     /**

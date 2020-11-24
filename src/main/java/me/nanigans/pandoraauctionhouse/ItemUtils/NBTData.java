@@ -49,6 +49,9 @@ public class NBTData {
             net.minecraft.server.v1_8_R3.ItemStack stack = CraftItemStack.asNMSCopy(item);
 
             stack.getTag().remove(key);
+            if(stack.getTag().c().size() <= 0){
+                stack.setTag(null);
+            }
             item = CraftItemStack.asCraftMirror(stack);
 
         }

@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation.createItem;
@@ -31,6 +32,7 @@ public class ConfirmInventoryActions extends InventoryActions{
     private ItemStack itemWithData;
     private double price = 0;
     private UUID seller;
+    private String itemUUID;
 
     public ConfirmInventoryActions(AuctionHouseInventory info) {
         super(info);
@@ -51,19 +53,23 @@ public class ConfirmInventoryActions extends InventoryActions{
             if (seller != null) {
                 User selling = Essentials.getPlugin(Essentials.class).getUser(seller);
                 try {
-                    if(info.getCategory() != AuctionCategories.ALL) {
-                        ConfigUtils.removeItemFromPlayerListing(item, seller, info.getCategory(), item.getType());
-                    }else{
-                        final AuctionCategories itemCategory = ItemType.getItemCategory(item);
-                        ConfigUtils.removeItemFromPlayerListing(item, seller, itemCategory, item.getType());
-                    }
-                    ConfigUtils.removeItemFromPlayerListing(item, seller, AuctionCategories.ALL, item.getType());
 
                     selling.giveMoney(cost);
                     buyer.takeMoney(cost);
-                    if (!info.getPlayer().getInventory().addItem(item).isEmpty()) {
-                        info.getPlayer().getWorld().dropItem(info.getPlayer().getLocation(), item);
+
+                    final AuctionCategories itemCategory1 = ItemType.getItemCategory(item);
+                    ConfigUtils.giveItemsBackToPlayer(info.getPlayer(),
+                            info.getPlugin().path+"Categories/"+itemCategory1+"/"+item.getType()+"/"+seller.toString()+".yml",
+                            itemCategory1, itemUUID);
+
+                    if(info.getCategory() != AuctionCategories.ALL) {
+                        ConfigUtils.removeItemFromPlayerListing(itemUUID, seller.toString(), info.getCategory(), item.getType());
+                    }else{
+                        final AuctionCategories itemCategory = ItemType.getItemCategory(item);
+                        ConfigUtils.removeItemFromPlayerListing(itemUUID, seller.toString(), itemCategory, item.getType());
                     }
+                    ConfigUtils.removeItemFromPlayerListing(itemUUID, seller.toString(), AuctionCategories.ALL, item.getType());
+
                     if(Bukkit.getOfflinePlayer(seller).isOnline()){
                         selling.sendMessage(ChatColor.GREEN+"A player has just bought an item from you in the auction house!");
                     }else{
@@ -76,6 +82,7 @@ public class ConfirmInventoryActions extends InventoryActions{
                 }catch(Exception err){
                     info.getPlayer().sendMessage(ChatColor.RED+"Something went wrong when trying to purchase this item");
                     info.getPlayer().closeInventory();
+                    err.printStackTrace();
                 }
             }
         }else{
@@ -88,11 +95,12 @@ public class ConfirmInventoryActions extends InventoryActions{
     public void setItem(ItemStack item) {
         String priceStr = NBTData.getNBT(item, NBTEnums.NBT.PRICE.toString());
         if(priceStr != null){
-        price = Double.parseDouble(priceStr);
-        seller = UUID.fromString(NBTData.getNBT(item, NBTEnums.NBT.SELLER.toString()));
+            this.itemUUID = NBTData.getNBT(item, "UUID");
 
-        this.item = InventoryActionUtils.removeNBTFromItem(ListingInventoryActions.removeItemInformation(item));
+            price = Double.parseDouble(priceStr);
+            seller = UUID.fromString(NBTData.getNBT(item, NBTEnums.NBT.SELLER.toString()));
 
+            this.item = item;
         }else{
             info.getPlayer().closeInventory();
             info.getPlayer().sendMessage(ChatColor.RED+"This item cannot be bough");
