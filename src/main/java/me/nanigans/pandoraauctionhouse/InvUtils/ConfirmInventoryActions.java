@@ -18,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import static me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation.createItem;
@@ -39,6 +38,7 @@ public class ConfirmInventoryActions extends InventoryActions{
         listingsMethods.put("denyPurchase", this::denyPurchase);
         listingsMethods.put("confirmPurchase", this::confirmPurchase);
     }
+
 
     protected void denyPurchase(){
         info.setInvType(InventoryType.LISTINGS);
@@ -80,7 +80,7 @@ public class ConfirmInventoryActions extends InventoryActions{
                     info.getPlayer().closeInventory();
                     info.getPlayer().sendMessage(ChatColor.RED+"Cannot purchase this item due to the seller having a the maximum balance allowed");
                 }catch(Exception err){
-                    info.getPlayer().sendMessage(ChatColor.RED+"Something went wrong when trying to purchase this item");
+                    info.getPlayer().sendMessage(ChatColor.RED+"Something went wrong when trying to purchase this item. The seller might have removed the item from the auction house or someone else just bought it");
                     info.getPlayer().closeInventory();
                     err.printStackTrace();
                 }

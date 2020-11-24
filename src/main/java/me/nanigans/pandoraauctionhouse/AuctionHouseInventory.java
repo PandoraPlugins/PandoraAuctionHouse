@@ -104,7 +104,6 @@ public class AuctionHouseInventory implements Listener {
                                 ConfigUtils.removePlayerListing(this, itemCategory, currentItem.getType());
                             }
                             inventory.setItem(event.getSlot(), InventoryCreation.createItem("160/4", "Empty Slot"));
-                            player.sendMessage(ChatColor.GREEN+"Item removed from listing!");
 
                         }else if(data.equals("confirmPurchase") && ListingInventoryActions.isOwnItem(this.player, currentItem)){
 
