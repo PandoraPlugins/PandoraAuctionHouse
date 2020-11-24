@@ -351,7 +351,10 @@ public class ListingInventoryActions extends InventoryActions{
             final long hours = TimeUnit.HOURS.convert((time - currentTime)%86400000, TimeUnit.MILLISECONDS);
             final long minutes = (time-currentTime)/(60 * 1000) % 60;
             lore.add(ChatColor.GRAY + "Expires: " + ChatColor.WHITE + days+"D " + hours+"H "+minutes+"M");//ItemData.formatTime(time));
-        }else lore.add(ChatColor.GRAY+"Expires: " + ChatColor.DARK_RED+"EXPIRED");
+        }else{
+            lore.add(ChatColor.GRAY+"Expires: " + ChatColor.DARK_RED+"EXPIRED");
+            NBTData.removeNBT(item, NBT.METHOD.toString());
+        }
 
         OfflinePlayer seller = Bukkit.getOfflinePlayer(UUID.fromString(NBTData.getNBT(item, NBT.SELLER.toString())));
         lore.add(ChatColor.GRAY+"Seller: "+ChatColor.GOLD+seller.getName());

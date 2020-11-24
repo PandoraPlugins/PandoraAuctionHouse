@@ -105,7 +105,7 @@ public class AuctionHouseInventory implements Listener {
                             }
                             inventory.setItem(event.getSlot(), InventoryCreation.createItem("160/4", "Empty Slot"));
 
-                        }else if(data.equals("confirmPurchase") && ListingInventoryActions.isOwnItem(this.player, currentItem)){
+                        }else if((data.equals("confirmPurchase") || NBTData.containsNBT(currentItem, "UUID")) && ListingInventoryActions.isOwnItem(this.player, currentItem)){
 
                              String uuid = NBTData.getNBT(currentItem, NBTEnums.NBT.SELLER.toString());
                             ConfigUtils.giveItemsBackToPlayer(player, plugin.path+"Categories/"+this.category+"/"+this.viewingMaterial+"/"+player.getUniqueId()+".yml",
