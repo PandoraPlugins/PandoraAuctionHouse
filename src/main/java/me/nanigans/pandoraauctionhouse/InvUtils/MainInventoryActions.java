@@ -66,18 +66,27 @@ public class MainInventoryActions extends InventoryActions{
 
     @Override
     public void click(String method) {
-        if(methods.containsKey(method))
-        methods.get(method).execute();
-        else if(mainMethods.containsKey(method))
-            mainMethods.get(method).execute();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if(methods.containsKey(method))
+                    methods.get(method).execute();
+                else if(mainMethods.containsKey(method))
+                    mainMethods.get(method).execute();
+            }
+        }.runTask(info.getPlugin());
     }
 
-
     private void openMaterial(){
-        info.setViewingMaterial(info.getLastClicked().getType());
-        Inventory inv = info.getListingInventory().createInventory();
-        info.swapInvs(inv);
-        info.setInvType(InventoryType.LISTINGS);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                info.setViewingMaterial(info.getLastClicked().getType());
+                Inventory inv = info.getListingInventory().createInventory();
+                info.swapInvs(inv);
+                info.setInvType(InventoryType.LISTINGS);
+            }
+        }.runTask(info.getPlugin());
     }
 
     /**
@@ -277,7 +286,7 @@ public class MainInventoryActions extends InventoryActions{
      */
     @Override
     public Inventory createInventory(){
-
+        info.setSorted(Sorted.A_Z);
         Inventory inventory = Bukkit.createInventory(info.getPlayer(), 54, "Auction House");
         inventory.setItem(0, createItem("160/14", "Up", "METHOD~categoryUp"));//
         inventory.setItem(45, createItem("160/5", "Down", "METHOD~categoryDown"));//
@@ -299,7 +308,7 @@ public class MainInventoryActions extends InventoryActions{
         filters.setItemMeta(itemMeta);
         inventory.setItem(25, filters);
 
-        inventory.setItem(26, createItem(Material.NAME_TAG, "Search By Item Name", "METHOD~searchBy"));
+        inventory.setItem(26, createItem(Material.NAME_TAG, "Search By Item Material", "METHOD~searchBy"));
         inventory.setItem(34, createItem(Material.BOOKSHELF, ChatColor.AQUA+"Auction Information"));
         inventory.setItem(53, createItem(Material.PAPER, "Balance: "+
                 ChatColor.GREEN+"$" + Essentials.getPlugin(Essentials.class).getUser(info.getPlayer()).getMoney()));

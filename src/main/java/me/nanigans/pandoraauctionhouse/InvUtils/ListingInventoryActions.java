@@ -112,9 +112,14 @@ public class ListingInventoryActions extends InventoryActions{
     }
 
     protected void back(){
-        Inventory inv = info.getMainInventory().createInventory();
-        info.swapInvs(inv);
-        info.setInvType(InventoryType.MAIN);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Inventory inv = info.getMainInventory().createInventory();
+                info.swapInvs(inv);
+                info.setInvType(InventoryType.MAIN);
+            }
+        }.runTask(info.getPlugin());
     }
 
     /**

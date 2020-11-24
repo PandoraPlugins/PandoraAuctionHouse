@@ -70,7 +70,6 @@ public class InventoryActionUtils {
      */
     public static void sortByTimeStamp(List<ItemStack> list, boolean inverse){
 
-        System.out.println("inverse = " + inverse);
         list.sort((i, j) -> {
             Long time1 = Long.parseLong(NBTData.getNBT(i, NBTEnums.NBT.DATESOLD.toString()));
             Long time2 = Long.parseLong(NBTData.getNBT(j, NBTEnums.NBT.DATESOLD.toString()));
