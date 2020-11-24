@@ -246,7 +246,7 @@ public class MainInventoryActions extends InventoryActions{
 
                     if(info.getMessage() != null){
 
-                        String message = info.getMessage();//TODO: possibly figure out how to get it by the actual item name and not material
+                        String message = info.getMessage();//TODO: possibly figure out how to get it by the actual item name and not material enum
                         final List<ExtractedResult> result = FuzzySearch.extractAll(message, ConfigUtils.getMaterialsFromCategory(info.getCategory())
                                 .stream().map(Enum::toString).collect(Collectors.toList())).stream().filter(i -> i.getScore() > 70).collect(Collectors.toList());
                         info.setMessage(null);

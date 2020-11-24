@@ -9,6 +9,7 @@ import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.YamlGenerator;
 import me.nanigans.pandoraauctionhouse.ItemUtils.ItemData;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
+import me.nanigans.pandoraauctionhouse.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -108,6 +109,51 @@ public class ListingInventoryActions extends InventoryActions{
 
     @Override
     protected void searchBy() {
+        info.setSwappingInvs(true);
+        info.getPlayer().closeInventory();
+
+        new Title().send(info.getPlayer(), ChatColor.GOLD+"Enter a players name", ChatColor.WHITE+"20 seconds",
+                10, 100, 10);
+
+                long time = System.currentTimeMillis()+10000;
+                info.setTyping(true);
+                while(System.currentTimeMillis() < time){
+
+                    if(info.getMessage() != null){
+
+                        String message = info.getMessage();//TODO: possibly figure out how to get it by the actual item name and not material enum
+                        final UUID uniqueId = Bukkit.getOfflinePlayer(message).getUniqueId();
+                        if(uniqueId != null){
+                            if(Bukkit.getOfflinePlayer(uniqueId).getPlayer() != null){
+
+                                YamlGenerator yaml = new YamlGenerator(invPath+"/"+uniqueId.toString()+".yml");
+                                final FileConfiguration data = yaml.getData();
+                                final List<ItemStack> selling = (List<ItemStack>) data.getList("selling");
+                                clearItems(invSize);
+                                displayItems(selling, "METHOD~confirmPurchase");
+                                info.swapInvs(info.getInventory());
+                            }else{
+                                info.getPlayer().sendMessage(ChatColor.RED+"Couldn't find that player");
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        info.getPlayer().openInventory(info.getInventory());
+                                    }
+                                }.runTaskLater(info.getPlugin(), 40);
+                            }
+                        }
+
+                        info.setMessage(null);
+                        info.setTyping(false);
+
+                        return;
+                    }
+
+                }
+                info.setMessage(null);
+                info.setTyping(false);
+                info.getPlayer().openInventory(info.getInventory());
+
 
     }
 
@@ -227,7 +273,7 @@ public class ListingInventoryActions extends InventoryActions{
             sortBy.setItemMeta(sMeta);
 
             inv.setItem(inv.getSize()-2, sortBy);
-            inv.setItem(inv.getSize()-1, createItem(Material.NAME_TAG, "Search by player", "METHOD~searchBy"));
+            inv.setItem(inv.getSize()-1, createItem(Material.NAME_TAG, "Search By Player Name", "METHOD~searchBy"));
 
             File matFile = new File(info.getPlugin().path + "Categories/" + info.getCategory() + "/" + info.getViewingMaterial());
             if (matFile.exists()) {
@@ -254,7 +300,7 @@ public class ListingInventoryActions extends InventoryActions{
      * @param selling the items being shown
      * @param nbt any nbt to put on each item
      */
-    private void displayItems(List<ItemStack> selling, String... nbt){
+    private void displayItems(@org.jetbrains.annotations.NotNull List<ItemStack> selling, String... nbt){
 
         short place = 0;
         for(int i = info.getPage()*invSize; i < invSize*(info.getPage()+1); i++){
