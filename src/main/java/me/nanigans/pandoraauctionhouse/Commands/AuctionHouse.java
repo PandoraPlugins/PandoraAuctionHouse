@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 public class AuctionHouse implements CommandExecutor {
     @Override

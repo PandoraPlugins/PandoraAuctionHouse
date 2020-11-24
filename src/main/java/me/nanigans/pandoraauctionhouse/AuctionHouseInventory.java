@@ -107,19 +107,21 @@ public class AuctionHouseInventory implements Listener {
 
                             }
                         }else if(data.equals("confirmPurchase") && ListingInventoryActions.isOwnItem(this.player, currentItem)){
-                             ItemStack copy = InventoryActionUtils.removeNBTFromItem(ListingInventoryActions.removeItemInformation(currentItem.clone()));
 
+                             UUID uuid = UUID.fromString(NBTData.getNBT(currentItem, NBTEnums.NBT.SELLER.toString()));
+                            currentItem = ListingInventoryActions.removeItemInformation(currentItem);
+                            currentItem = InventoryActionUtils.removeNBTFromItem(currentItem);
+                            System.out.println("currentItem = " + currentItem);
                             if(this.category != AuctionCategories.ALL) {
                                 ConfigUtils.removeItemFromPlayerListing(currentItem,
                                         UUID.fromString(NBTData.getNBT(currentItem, NBTEnums.NBT.SELLER.toString())),
                                         this.category, currentItem.getType());
                             }else{
-
                                 final AuctionCategories itemCategory = ItemType.getItemCategory(currentItem);
-                                ConfigUtils.removeItemFromPlayerListing(copy, UUID.fromString(NBTData.getNBT(currentItem, NBTEnums.NBT.SELLER.toString())),
+                                ConfigUtils.removeItemFromPlayerListing(currentItem, uuid,
                                 itemCategory, currentItem.getType());
                             }
-                            ConfigUtils.removeItemFromPlayerListing(currentItem, UUID.fromString(NBTData.getNBT(currentItem, NBTEnums.NBT.SELLER.toString())),
+                            ConfigUtils.removeItemFromPlayerListing(currentItem, uuid,
                                     AuctionCategories.ALL, currentItem.getType());
                             if (!this.player.getInventory().addItem(currentItem).isEmpty()) {
                                 this.player.getWorld().dropItem(this.player.getLocation(), currentItem);
