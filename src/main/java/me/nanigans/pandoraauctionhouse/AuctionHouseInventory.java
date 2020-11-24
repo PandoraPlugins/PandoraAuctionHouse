@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -38,6 +39,7 @@ public class AuctionHouseInventory implements Listener {
     private Material viewingMaterial;
     private final MainInventoryActions mainInventory = new MainInventoryActions(this);
     private final ListingInventoryActions listingInventory = new ListingInventoryActions(this);
+    private ClickType clickType;
 
     public AuctionHouseInventory(Player player){
 
@@ -60,6 +62,7 @@ public class AuctionHouseInventory implements Listener {
         if(event.getInventory().equals(this.inventory)){
             event.setCancelled(true);
             final ItemStack currentItem = event.getCurrentItem();
+            this.clickType = event.getClick();
             if(event.getAction().toString().contains("PICKUP")) {
                 ((Player) event.getWhoClicked()).playSound(this.player.getLocation(), Sound.valueOf("CLICK"), 2, 1);
                 if (currentItem != null) {
@@ -143,6 +146,11 @@ public class AuctionHouseInventory implements Listener {
             this.swappingInvs = false;
         }
 
+    }
+
+
+    public ClickType getClickType() {
+        return clickType;
     }
 
     public MainInventoryActions getMainInventory() {

@@ -31,7 +31,7 @@ public class AuctionHouse implements CommandExecutor {
 
                     if(player.getInventory().getItemInHand() != null) {
                         ItemStack item = player.getInventory().getItemInHand();
-                        player.getInventory().removeItem(item);
+                        player.getInventory().setItemInHand(null);
 
                         try {
                             double price = Double.parseDouble(args[1]);

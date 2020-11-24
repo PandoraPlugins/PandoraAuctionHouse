@@ -4,7 +4,9 @@ public enum Sorted{
     A_Z,
     Z_A,
     NEWEST,
-    OLDEST
+    OLDEST,
+    CHEAPEST,
+    EXPENSIVE
 }
 /*
 

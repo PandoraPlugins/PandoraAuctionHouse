@@ -1,15 +1,15 @@
 package me.nanigans.pandoraauctionhouse.InvUtils;
 
 import me.nanigans.pandoraauctionhouse.AuctionHouseInventory;
+import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums;
 import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
+import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
 import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static me.nanigans.pandoraauctionhouse.InvUtils.InventoryCreation.createItem;
@@ -48,6 +48,48 @@ public class InventoryActionUtils {
         List<String> stringified = list.stream().map(Object::toString).sorted().collect(Collectors.toList());
         if(inverse) Collections.reverse(stringified);
         return stringified;
+    }
+
+    /**
+     * Sorts by display name
+     * Will sort it A-Z without inverse
+     * @param list the list to sort
+     * @param inverse if to inverse the list afterwards
+     */
+    public static void sortByAlphabetDisplayName(List<ItemStack> list, boolean inverse){
+
+        list.sort(Comparator.comparing(i -> (i.getItemMeta().getDisplayName() == null ? String.valueOf(Character.MAX_VALUE) : i.getItemMeta().getDisplayName())));
+        if(inverse) Collections.reverse(list);
+    }
+
+    /**
+     * Sorts by timestamp
+     * Will sort by highest to lowest timestamp
+     * @param list item to sort
+     * @param inverse if to inverse the list
+     */
+    public static void sortByTimeStamp(List<ItemStack> list, boolean inverse){
+
+        System.out.println("inverse = " + inverse);
+        list.sort((i, j) -> {
+            Long time1 = Long.parseLong(NBTData.getNBT(i, NBTEnums.NBT.DATESOLD.toString()));
+            Long time2 = Long.parseLong(NBTData.getNBT(j, NBTEnums.NBT.DATESOLD.toString()));
+            return time1.compareTo(time2);
+        });
+        if(inverse) Collections.reverse(list);
+
+    }
+
+    /**
+     * Sorts the listings by price
+     * @param list the list to sort
+     * @param inverse to inverse the list
+     */
+    public static void sortByPrice(List<ItemStack> list, boolean inverse){
+
+        list.sort(Comparator.comparingDouble(i -> Double.parseDouble(NBTData.getNBT(i, NBTEnums.NBT.PRICE.toString()))));
+        if(!inverse) Collections.reverse(list);
+
     }
 
     /**
