@@ -3,6 +3,7 @@ package me.nanigans.pandoraauctionhouse;
 import me.nanigans.pandoraauctionhouse.Classifications.*;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.InvUtils.ConfirmInventoryActions;
+import me.nanigans.pandoraauctionhouse.InvUtils.InventoryActionUtils;
 import me.nanigans.pandoraauctionhouse.InvUtils.ListingInventoryActions;
 import me.nanigans.pandoraauctionhouse.InvUtils.MainInventoryActions;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
@@ -19,6 +20,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.UUID;
 
 public class AuctionHouseInventory implements Listener {
 
@@ -60,7 +63,7 @@ public class AuctionHouseInventory implements Listener {
 
         if(event.getInventory().equals(this.inventory)){
             event.setCancelled(true);
-            final ItemStack currentItem = event.getCurrentItem();
+            ItemStack currentItem = event.getCurrentItem();
             this.clickType = event.getClick();
             if(event.getAction().toString().contains("PICKUP")) {
                 ((Player) event.getWhoClicked()).playSound(this.player.getLocation(), Sound.valueOf("CLICK"), 2, 1);
@@ -103,6 +106,25 @@ public class AuctionHouseInventory implements Listener {
                                 ConfigUtils.removePlayerListing(this, itemCategory, currentItem.getType());
 
                             }
+                        }else if(data.equals("confirmPurchase") && ListingInventoryActions.isOwnItem(this.player, currentItem)){
+                             ItemStack copy = InventoryActionUtils.removeNBTFromItem(ListingInventoryActions.removeItemInformation(currentItem.clone()));
+
+                            if(this.category != AuctionCategories.ALL) {
+                                ConfigUtils.removeItemFromPlayerListing(currentItem,
+                                        UUID.fromString(NBTData.getNBT(currentItem, NBTEnums.NBT.SELLER.toString())),
+                                        this.category, currentItem.getType());
+                            }else{
+
+                                final AuctionCategories itemCategory = ItemType.getItemCategory(currentItem);
+                                ConfigUtils.removeItemFromPlayerListing(copy, UUID.fromString(NBTData.getNBT(currentItem, NBTEnums.NBT.SELLER.toString())),
+                                itemCategory, currentItem.getType());
+                            }
+                            ConfigUtils.removeItemFromPlayerListing(currentItem, UUID.fromString(NBTData.getNBT(currentItem, NBTEnums.NBT.SELLER.toString())),
+                                    AuctionCategories.ALL, currentItem.getType());
+                            if (!this.player.getInventory().addItem(currentItem).isEmpty()) {
+                                this.player.getWorld().dropItem(this.player.getLocation(), currentItem);
+                            }
+
                         }
                     }
 

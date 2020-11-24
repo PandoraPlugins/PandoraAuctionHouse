@@ -16,6 +16,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -49,17 +50,19 @@ public class ListingInventoryActions extends InventoryActions{
 
     protected void confirmPurchase(){
 
-        info.getConfirmInventory().setItem(info.getLastClicked());
-        info.getConfirmInventory().setItemWithData(info.getLastClicked());
-        info.setInvType(InventoryType.CONFIRM);
-        Inventory inv = info.getConfirmInventory().createInventory();
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                info.swapInvs(inv);
+        if(!isOwnItem(info.getPlayer(), info.getLastClicked())) {
+            info.getConfirmInventory().setItem(info.getLastClicked());
+            info.getConfirmInventory().setItemWithData(info.getLastClicked());
+            info.setInvType(InventoryType.CONFIRM);
+            Inventory inv = info.getConfirmInventory().createInventory();
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    info.swapInvs(inv);
 
-            }
-        }.runTask(info.getPlugin());
+                }
+            }.runTask(info.getPlugin());
+        }
 
     }
 
@@ -315,7 +318,7 @@ public class ListingInventoryActions extends InventoryActions{
      * @param selling the items being shown
      * @param nbt any nbt to put on each item
      */
-    private void displayItems(@org.jetbrains.annotations.NotNull List<ItemStack> selling, String... nbt){
+    private void displayItems(List<ItemStack> selling, String... nbt){
 
         short place = 0;
         for(int i = info.getPage()*invSize; i < invSize*(info.getPage()+1); i++){
@@ -351,13 +354,23 @@ public class ListingInventoryActions extends InventoryActions{
         OfflinePlayer seller = Bukkit.getOfflinePlayer(UUID.fromString(NBTData.getNBT(item, NBT.SELLER.toString())));
         lore.add(ChatColor.GRAY+"Seller: "+ChatColor.GOLD+seller.getName());
 
-        if(NBTData.getNBT(item, NBT.SELLER.toString()).equals(info.getPlayer().getUniqueId().toString())){
+        if(isOwnItem(info.getPlayer(), item)){
+            lore.add(ChatColor.RED+"You cannot purchase this item");
             lore.add("Press Q to delete this listing");
         }
 
         meta.setLore(lore);
         item.setItemMeta(meta);
 
+    }
+
+    public static boolean isOwnItem(Player player, ItemStack item){
+
+        final String nbt = NBTData.getNBT(item, NBT.SELLER.toString());
+        if(nbt != null){
+            return nbt.equals(player.getUniqueId().toString());
+        }
+        return false;
     }
 
     public static ItemStack removeItemInformation(ItemStack item){
@@ -367,7 +380,7 @@ public class ListingInventoryActions extends InventoryActions{
         if(lore != null){
 
             lore = lore.stream().filter(i -> !i.contains(ChatColor.GRAY+"Price: ") && !i.contains(ChatColor.GRAY+"Expires: ") &&
-                    !i.contains(ChatColor.GRAY+"Seller: ") && !i.contains("Press Q to delete this listing")).collect(Collectors.toList());
+                    !i.contains(ChatColor.GRAY+"Seller: ") && !i.contains("Press Q to delete this listing") && !i.contains(ChatColor.RED+"You cannot purchase this item")).collect(Collectors.toList());
             meta.setLore(lore);
             item.setItemMeta(meta);
 
