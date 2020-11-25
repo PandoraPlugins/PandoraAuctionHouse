@@ -173,7 +173,7 @@ public class MainInventoryActions extends InventoryActions{
     protected void pageForward() {
 
         List<String> materialList = InventoryActionUtils.sortByAlphabetical(
-                ConfigUtils.getMaterialsFromCategory(info.getCategory()), info.getSorted() == Sorted.Z_A);//item listings by material
+                ConfigUtils.getMaterialsFromCategory(info.getCategory(), false), info.getSorted() == Sorted.Z_A);//item listings by material
 
         info.setPage((int) Math.min(Math.floor((double)materialList.size()/itemPlaces.length), info.getPage()+1));
 
@@ -194,7 +194,7 @@ public class MainInventoryActions extends InventoryActions{
     protected void pageBackwards() {
 
         List<String> materialList = InventoryActionUtils.sortByAlphabetical(
-                ConfigUtils.getMaterialsFromCategory(info.getCategory()), info.getSorted() == Sorted.Z_A);//item listings by material
+                ConfigUtils.getMaterialsFromCategory(info.getCategory(), false), info.getSorted() == Sorted.Z_A);//item listings by material
         info.setPage(info.getPage()-1);
 
         InventoryActionUtils.clearItemBoard(info);
@@ -247,9 +247,11 @@ public class MainInventoryActions extends InventoryActions{
 
                     if(info.getMessage() != null){
 
-                        String message = info.getMessage();//TODO: possibly figure out how to get it by the actual item name and not material enum
-                        final List<ExtractedResult> result = FuzzySearch.extractAll(message, ConfigUtils.getMaterialsFromCategory(info.getCategory())
-                                .stream().map(Enum::toString).collect(Collectors.toList())).stream().filter(i -> i.getScore() > 70).collect(Collectors.toList());
+                        String message = info.getMessage();
+
+                        final List<ExtractedResult> result = FuzzySearch.extractAll(message,
+                                new ArrayList<>(ConfigUtils.getMaterialsFromCategory(info.getCategory(), true)))
+                                .stream().filter(i -> i.getScore() > 70).collect(Collectors.toList());
                         info.setMessage(null);
                         info.setTyping(false);
 
@@ -310,7 +312,12 @@ public class MainInventoryActions extends InventoryActions{
         inventory.setItem(25, filters);
 
         inventory.setItem(26, createItem(Material.NAME_TAG, "Search By Item Material", NBTEnums.NBT.METHOD+"~searchBy"));
-        inventory.setItem(34, createItem(Material.BOOKSHELF, ChatColor.AQUA+"Auction Information"));
+        ItemStack auctionInfo =createItem(Material.BOOKSHELF, ChatColor.AQUA+"Auction Information");
+        ItemMeta aMeta = auctionInfo.getItemMeta();
+        aMeta.setLore(InventoryActionUtils.wordWrapLore("This is the Auction House! To list items, use the command /ah sell. To remove your listings," +
+                " press your drop key on a category, a material or your listing", " ", ChatColor.LIGHT_PURPLE));
+        auctionInfo.setItemMeta(aMeta);
+        inventory.setItem(34, auctionInfo);
         inventory.setItem(53, createItem(Material.PAPER, "Balance: "+
                 ChatColor.GREEN+"$" + Essentials.getPlugin(Essentials.class).getUser(info.getPlayer()).getMoney()));
 
@@ -320,12 +327,12 @@ public class MainInventoryActions extends InventoryActions{
         }
 
         List<String> materialList = InventoryActionUtils.sortByAlphabetical(
-                ConfigUtils.getMaterialsFromCategory(info.getCategory()), info.getSorted() == Sorted.Z_A);//item listings by material
+                ConfigUtils.getMaterialsFromCategory(info.getCategory(), false), info.getSorted() == Sorted.Z_A);//item listings by material
 
         iterator = Arrays.stream(itemPlaces).iterator();
         for(int i = info.getPage()*materialList.size(); i < materialList.size()*(info.getPage()+1); i++){
             if(materialList.size() > i && iterator.hasNext())
-                inventory.setItem(iterator.next(), createItem(Material.valueOf(materialList.get(i)), null, NBTEnums.NBT.METHOD+"~openMaterial"));
+                inventory.setItem(iterator.next(), createItem(Material.valueOf(materialList.get(i).toUpperCase()), null, NBTEnums.NBT.METHOD+"~openMaterial"));
             else break;
         }
 

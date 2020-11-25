@@ -7,6 +7,7 @@ import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
 import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
@@ -27,7 +28,7 @@ public class InventoryActionUtils {
 
         info.setPage(0);
         List<String> materialList = InventoryActionUtils.sortByAlphabetical(
-                ConfigUtils.getMaterialsFromCategory(info.getCategory()), info.getSorted() == Sorted.Z_A);//item listings by material
+                ConfigUtils.getMaterialsFromCategory(info.getCategory(), false), info.getSorted() == Sorted.Z_A);//item listings by material
 
         Iterator<Integer> iterator = Arrays.stream(itemPlaces).iterator();
         for(int i = info.getPage()*materialList.size(); i < materialList.size()*(info.getPage()+1); i++){
@@ -93,6 +94,11 @@ public class InventoryActionUtils {
 
     }
 
+    public static String getItemName(ItemStack item) {
+        net.minecraft.server.v1_8_R3.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
+        return nmsStack.getItem().a(nmsStack);
+    }
+
     /**
      * Sets the listing board to what was found in the list
      * @param info auction info
@@ -103,9 +109,12 @@ public class InventoryActionUtils {
         clearItemBoard(info);
         Iterator<Integer> iterator = Arrays.stream(itemPlaces).iterator();
         for(int i = info.getPage()*list.size(); i < list.size()*(info.getPage()+1); i++){
-            if(list.size() > i && iterator.hasNext())
-                info.getInventory().setItem(iterator.next(), createItem(Material.valueOf(list.get(i).getString()), null, NBTEnums.NBT.METHOD+"~openMaterial"));
-            else break;
+            if(list.size() > i && iterator.hasNext()) {
+                if(list.get(i).getString().contains("~")){
+                    info.getInventory().setItem(iterator.next(), createItem(Material.valueOf(list.get(i).getString().split("~")[1]), null, NBTEnums.NBT.METHOD + "~openMaterial"));
+                }else
+                info.getInventory().setItem(iterator.next(), createItem(Material.valueOf(list.get(i).getString()), null, NBTEnums.NBT.METHOD + "~openMaterial"));
+            }else break;
         }
 
         info.swapInvs(info.getInventory());
@@ -143,6 +152,17 @@ public class InventoryActionUtils {
         for (int itemPlace : itemPlaces) {
             info.getInventory().setItem(itemPlace, createItem("160/4", "Empty Slot"));
         }
+
+    }
+
+    public static List<String> wordWrapLore(String string, String splitter, ChatColor color) {
+        StringBuilder sb = new StringBuilder(color+string);
+
+        int i = 0;
+        while (i + 35 < sb.length() && (i = sb.lastIndexOf(splitter, i + 35)) != -1) {
+            sb.replace(i, i + 1, "\n"+color);
+        }
+        return Arrays.asList(sb.toString().split("\n"));
 
     }
 

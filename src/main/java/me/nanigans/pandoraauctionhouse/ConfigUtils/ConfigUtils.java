@@ -236,16 +236,22 @@ public class ConfigUtils {
     /**
      * Gets all the materials from a category
      * @param category the category need to get the material list
+     * @param asItemName
      * @return a list of materials
      */
-    public static List<Material> getMaterialsFromCategory(AuctionCategories category){
+    public static List<String> getMaterialsFromCategory(AuctionCategories category, boolean asItemName){
         PandoraAuctionHouse plugin = PandoraAuctionHouse.getPlugin(PandoraAuctionHouse.class);
-        List<Material> list = new ArrayList<>();
+        List<String> list = new ArrayList<>();
         File file = new File(plugin.path+"/Categories/"+category);
 
         for (String s : file.list()) {
-            if(new File(file.getPath()+"/"+s).isDirectory())
-                list.add(Material.valueOf(s));
+            if(new File(file.getPath()+"/"+s).isDirectory()) {
+                if(!asItemName)
+                list.add(Material.valueOf(s).toString());
+                else{
+                    list.add(InventoryActionUtils.getItemName(new ItemStack(Material.valueOf(s)))+"~"+s);
+                }
+            }
         }
         return list;
 

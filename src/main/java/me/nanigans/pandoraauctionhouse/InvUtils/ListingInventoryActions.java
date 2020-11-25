@@ -61,7 +61,6 @@ public class ListingInventoryActions extends InventoryActions{
                 @Override
                 public void run() {
                     info.swapInvs(inv);
-
                 }
             }.runTask(info.getPlugin());
         }
@@ -146,7 +145,7 @@ public class ListingInventoryActions extends InventoryActions{
 
                     if(info.getMessage() != null){
 
-                        String message = info.getMessage();//TODO: possibly figure out how to get it by the actual item name and not material enum
+                        String message = info.getMessage();
                         final UUID uniqueId = Bukkit.getOfflinePlayer(message).getUniqueId();
                         if(uniqueId != null){
                             if(Bukkit.getOfflinePlayer(uniqueId).getPlayer() != null){
