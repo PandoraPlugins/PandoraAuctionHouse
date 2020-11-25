@@ -7,6 +7,7 @@ import me.nanigans.pandoraauctionhouse.Classifications.InventoryType;
 import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums;
 import me.nanigans.pandoraauctionhouse.Classifications.NBTEnums.NBT;
 import me.nanigans.pandoraauctionhouse.Classifications.Sorted;
+import me.nanigans.pandoraauctionhouse.Commands.DateParser;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.ConfigUtils.YamlGenerator;
 import me.nanigans.pandoraauctionhouse.ItemUtils.ItemData;
@@ -51,7 +52,7 @@ public class ListingInventoryActions extends InventoryActions{
 
     protected void confirmPurchase(){
 
-        if(!isOwnItem(info.getPlayer(), info.getLastClicked())) {
+        if(!isOwnItem(info.getPlayer(), info.getLastClicked()) && isNotExpired(info.getLastClicked())) {
             info.getConfirmInventory().setItem(info.getLastClicked());
             info.getConfirmInventory().setItemWithData(info.getLastClicked());
             info.setInvType(InventoryType.CONFIRM);
@@ -65,6 +66,13 @@ public class ListingInventoryActions extends InventoryActions{
             }.runTask(info.getPlugin());
         }
 
+    }
+
+    private boolean isNotExpired(ItemStack item) {
+
+        final long time = Long.parseLong(NBTData.getNBT(item, NBT.DATEEXPIRE.toString()));
+        final long currentTime = new Date().getTime();
+        return time > currentTime;
     }
 
     @Override
@@ -347,13 +355,10 @@ public class ListingInventoryActions extends InventoryActions{
         final long time = Long.parseLong(NBTData.getNBT(item, NBT.DATEEXPIRE.toString()));
         final long currentTime = new Date().getTime();
         if(time > currentTime) {
-            final long days = TimeUnit.DAYS.convert(time - currentTime, TimeUnit.MILLISECONDS);
-            final long hours = TimeUnit.HOURS.convert((time - currentTime)%86400000, TimeUnit.MILLISECONDS);
-            final long minutes = (time-currentTime)/(60 * 1000) % 60;
-            lore.add(ChatColor.GRAY + "Expires: " + ChatColor.WHITE + days+"D " + hours+"H "+minutes+"M");//ItemData.formatTime(time));
+            lore.add(ChatColor.GRAY + "Expires: " + ChatColor.WHITE + DateParser.formatDateDiff(time));//ItemData.formatTime(time));
         }else{
             lore.add(ChatColor.GRAY+"Expires: " + ChatColor.DARK_RED+"EXPIRED");
-            NBTData.removeNBT(item, NBT.METHOD.toString());
+            item = NBTData.removeNBT(item, NBTEnums.NBT.METHOD.toString());
         }
 
         OfflinePlayer seller = Bukkit.getOfflinePlayer(UUID.fromString(NBTData.getNBT(item, NBT.SELLER.toString())));

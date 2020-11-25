@@ -8,6 +8,7 @@ import me.nanigans.pandoraauctionhouse.ConfigUtils.ConfigUtils;
 import me.nanigans.pandoraauctionhouse.ItemUtils.ItemData;
 import me.nanigans.pandoraauctionhouse.ItemUtils.NBTData;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -30,7 +31,7 @@ public class AuctionHouse implements CommandExecutor {
 
                 if(args.length > 1 && args[0].equalsIgnoreCase("sell")){
 
-                    if(player.getInventory().getItemInHand() != null) {
+                    if(player.getInventory().getItemInHand() != null && player.getInventory().getItemInHand().getType() != Material.AIR) {
                         ItemStack item = player.getInventory().getItemInHand();
                         player.getInventory().setItemInHand(null);
 
@@ -54,14 +55,23 @@ public class AuctionHouse implements CommandExecutor {
                                     player.sendMessage(ChatColor.RED+"This item cannot be sold");
                                     return true;
                                 }
+
+                                long time = 604800000+new Date().getTime();
+                                if(args.length > 2){
+                                    String t = String.join(" ", args).substring((args[1]+args[0]).length()+2);
+                                    System.out.println("t = " + t);
+                                    time = DateParser.parseDateDiff(t, true);
+                                }
+
                                 UUID uuid = UUID.randomUUID();
                                 item = NBTData.setNBT(item,
                                         NBT.PRICE + "~" + args[1],
-                                        NBT.DATEEXPIRE+"~"+(new Date().getTime()+604800000),//one week TODO: change this to cusomizable
+                                        NBT.DATEEXPIRE+"~"+(time),
                                         NBT.SELLER+"~"+player.getUniqueId(),
                                         NBT.DATESOLD+"~"+new Date().getTime(),
                                         "UUID~"+uuid
                                 );
+
 
                                 AuctionCategories category = ItemType.getItemCategory(item);
 
